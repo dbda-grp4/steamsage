@@ -209,5 +209,12 @@ This Data Dictionary should be used alongside the main `README.md` and analytics
 
 ## 🏗️ System Architecture (High-Level)
 
+## 🏗️ System Architecture
 
-![System Architecture Diagram](Architecture Diagram Colored.jpeg)
+<p align="center">
+  <img src="Architecture Diagram Colored.jpeg" alt="System Architecture Diagram" width="800"/>
+</p>
+
+<p align="center">
+  <em>Figure: Cloud-based big data pipeline for Steam Dataset analytics</em>
+</p>
