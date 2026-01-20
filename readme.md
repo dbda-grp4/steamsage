@@ -210,5 +210,5 @@ This Data Dictionary should be used alongside the main `README.md` and analytics
 ## 🏗️ System Architecture (High-Level)
 
 
-![Steam Big Data Architecture](diagrams/Architecture_Diagram_Colored.jpeg)
+![Steam Big Data Architecture](diagrams/Architecture_Diagram_colored.jpeg)
 
