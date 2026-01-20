@@ -208,30 +208,6 @@ This Data Dictionary should be used alongside the main `README.md` and analytics
 ---
 
 ## 🏗️ System Architecture (High-Level)
-1. **Data Ingestion** – Steam APIs  
-2. **Storage** – Cloud Data Lake  
-3. **Processing** – Apache Spark (ETL & Analytics)  
-4. **Analytics & ML** – Sentiment analysis, prediction models  
-5. **Visualization** – Power BI dashboards  
-6. **Automation** – Scheduled ETL jobs and scalable pipelines  
 
----
 
-## 📈 Expected Outcomes
-- Clear understanding of **drivers of game success on Steam**
-- Actionable insights for developers and publishers
-- Scalable analytics framework for future expansion
-- Foundation for **recommendation systems and advanced NLP**
-
----
-
-## 👥 Team
-**Group 4**  
-Big Data Analytics Project  
-Steam Dataset 2025
-
----
-
-## 📜 License & Usage
-This project is intended for **academic and research purposes only**.  
-Dataset usage complies with Kaggle’s licensing terms.
+![System Architecture Diagram](Architecture Diagram Colored.jpeg)
