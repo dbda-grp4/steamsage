@@ -1,4 +1,4 @@
-name: AWS Connection Test
+name: AWS Glue Automation
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - Roshani
 
 jobs:
-  test-aws:
+  upload-glue-scripts:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,6 +20,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Verify AWS connection
-        run: aws sts get-caller-identity
-
+      - name: Upload Glue scripts to S3
+        run: |
+          aws s3 sync glue_scripts s3://gamersvoice34/glue_scripts
