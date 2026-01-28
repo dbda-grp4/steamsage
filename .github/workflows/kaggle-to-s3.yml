@@ -1,38 +1,38 @@
-name: Kaggle Dataset Ingestion to S3
+name: Kaggle to S3 Automation
 
 on:
-  workflow_dispatch:
   push:
     branches:
-      - Roshani
+      - Roshani   # change if needed
 
 jobs:
   kaggle-to-s3:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      # 1️⃣ Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      # 2️⃣ Setup Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
+      # 3️⃣ Install Kaggle CLI
       - name: Install Kaggle CLI
         run: |
           pip install kaggle
 
+      # 4️⃣ Configure Kaggle credentials
       - name: Configure Kaggle credentials
         run: |
           mkdir -p ~/.kaggle
           echo "{\"username\":\"${{ secrets.KAGGLE_USERNAME }}\",\"key\":\"${{ secrets.KAGGLE_KEY }}\"}" > ~/.kaggle/kaggle.json
           chmod 600 ~/.kaggle/kaggle.json
 
-      - name: Download Kaggle dataset
-        run: |
-          kaggle datasets download -d crainbramp/steam-dataset-2025-multi-modal-gaming-analytics -p data --unzip
-
+      # 5️⃣ Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -40,6 +40,24 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Upload dataset to S3
+      # 6️⃣ Download Kaggle dataset (LONG step – timeout increased)
+      - name: Download Steam dataset from Kaggle
+        timeout-minutes: 20
         run: |
-          aws s3 sync data s3://steam-glue-roshani-2026/raw/
+          mkdir -p data
+          kaggle datasets download \
+            -d crainbramp/steam-dataset-2025-multi-modal-gaming-analytics \
+            -p data \
+            --unzip
+
+      # 7️⃣ Verify downloaded files (for logs & debugging)
+      - name: Verify downloaded files
+        run: |
+          echo "Listing downloaded files:"
+          ls -lh data
+
+      # 8️⃣ Upload raw data to S3
+      - name: Upload dataset to S3 (raw layer)
+        timeout-minutes: 15
+        run: |
+          aws s3 sync data/ s3://steam-glue-roshani-2026/raw/
