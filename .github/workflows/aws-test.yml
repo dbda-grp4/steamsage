@@ -22,4 +22,4 @@ jobs:
 
       - name: Upload Glue scripts to S3
         run: |
-          aws s3 sync glue_scripts s3://gamersvoice34/glue_scripts
+          aws s3 sync glue_scripts/ s3://steam-glue-roshani-2026/glue-scripts/
