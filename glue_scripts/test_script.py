@@ -1,7 +1,5 @@
-import sys
-from awsglue.utils import getResolvedOptions
-from awsglue.context import GlueContext
 from pyspark.context import SparkContext
+from awsglue.context import GlueContext
 
 # Initialize Spark and Glue context
 sc = SparkContext()
@@ -17,4 +15,9 @@ print("===================================")
 
 # Simple Spark operation (to prove Spark works)
 data = [("Roshani", "Terraform"), ("AWS", "Glue")]
-df = spark.createDataFrame(data, ["Name", "]()
+df = spark.createDataFrame(data, ["Name", "Tool"])
+df.show()
+
+print("===================================")
+print("AWS GLUE JOB COMPLETED SUCCESSFULLY")
+print("===================================")
