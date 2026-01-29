@@ -1,0 +1,250 @@
+Preparing ...
+Wed Jan 28 07:53:00 UTC 2026
+/usr/bin/java -cp /tmp:/opt/amazon/conf:/opt/amazon/glue-manifest.jar com.amazonaws.services.glue.PrepareLaunch --conf spark.dynamicAllocation.enabled=true --conf spark.shuffle.service.enabled=true --conf spark.dynamicAllocation.minExecutors=1 --conf spark.dynamicAllocation.maxExecutors=1 --conf spark.executor.memory=10g --conf spark.driver.memory=10g --conf spark.network.timeout=600   --enable-glue-datacatalog true  --job-bookmark-option job-bookmark-disable --TempDir s3://aws-glue-assets-561406826670-us-east-1/temporary/  --JOB_ID j_22018514746d12c3bf048f9a2983f6e8563224c29b6a7fcc0f05840f0c17a43a --enable-metrics true --enable-spark-ui true --spark-event-logs-path s3://steamaws-glue-assets-561406826670-us-east-1/sparkHistoryLogs/  --enable-job-insights true  --JOB_RUN_ID jr_8bc88906d3a6366e545e8ed8ecb493767f9f1f3866f7abe22ddd44ba94764989 --enable-observability-metrics true --scriptLocation s3://steam-dataset-2025-bucket/glue_scripts/join_bridges.py  --job-language python --JOB_NAME join_bridges_job
+openjdk version "1.8.0_472"
+
+OpenJDK Runtime Environment Corretto-8.472.08.1
+ (build 1.8.0_472-b08
+)
+OpenJDK 64-Bit Server VM Corretto-8.472.08.1 (build 25.472-b08, mixed mode)
+
+1769586781632
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/opt/amazon/spark/jars/log4j-slf4j-impl-2.17.2.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/opt/amazon/spark/jars/slf4j-reload4j-1.7.36.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/opt/amazon/lib/Log4j-slf4j-2.x.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/opt/amazon/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.apache.logging.slf4j.Log4jLoggerFactory]
+INFO	2026-01-28T07:53:03,791	3279	com.amazonaws.services.glue.PrepareLaunch	[main]	Get job script: join_bridges.py.
+INFO	2026-01-28T07:53:05,838	5326	com.amazonaws.services.glue.utils.AWSClientUtils$	[main]	AWSClientUtils: create aws log client with conf: proxy host null, proxy port -1
+INFO	2026-01-28T07:53:07,950	7438	com.amazonaws.services.glue.utils.AWSClientUtils$	[main]	AWSClientUtils: getGlueClient. proxy host: null , port: -1
+INFO	2026-01-28T07:53:08,876	8364	com.amazonaws.services.glue.utils.AWSClientUtils$	[main]	AWSClientUtils: create aws sts client with conf: proxy host null, proxy port -1
+INFO	2026-01-28T07:53:08,910	8398	com.amazonaws.services.glue.utils.AWSClientUtils$	[main]	Created STS client in region us-east-1
+GlueTelemetry: Current region us-east-1
+
+GlueTelemetry: Glue Endpoint https://glue.us-east-1.amazonaws.com
+GlueTelemetry: Prod env...false
+GlueTelemetry: is disabled
+INFO	2026-01-28T07:53:09,053	8541	com.amazonaws.services.glue.PrepareLaunch	[main]	Glue Connectors: attached connection types: ListBuffer()
+successfully created /opt/aws_glue_connectors/selected/redshift
+successfully created /opt/aws_glue_connectors/selected/datalake
+successfully created /opt/aws_glue_connectors/selected/native
+successfully created /opt/aws_glue_connectors/selected/marketplace
+successfully created /opt/aws_glue_connectors/selected/downloaded
+INFO	2026-01-28T07:53:09,061	8549	com.amazonaws.services.glue.connectors.NativeConnectorService$	[main]	Glue connectors: redshift connector jar dir -> new
+INFO	2026-01-28T07:53:09,061	8549	com.amazonaws.services.glue.connectors.NativeConnectorService$	[main]	Glue connectors: copying jars and metadata for Redshift
+INFO	2026-01-28T07:53:09,077	8565	com.amazonaws.services.glue.connectors.NativeConnectorService$	[main]	 File is spark-redshift_2.12-6.1.3-spark_3.3.jar
+INFO	2026-01-28T07:53:09,077	8565	com.amazonaws.services.glue.connectors.NativeConnectorService$	[main]	 File Destination  is /opt/aws_glue_connectors/selected/redshift/spark-redshift_2.12-6.1.3-spark_3.3.jar
+INFO	2026-01-28T07:53:09,082	8570	com.amazonaws.services.glue.connectors.NativeConnectorService$	[main]	Glue connectors: Copy connector /connectors/redshift/new/spark-redshift_2.12-6.1.3-spark_3.3.jar to /opt/aws_glue_connectors/selected/redshift/spark-redshift_2.12-6.1.3-spark_3.3.jar
+INFO	2026-01-28T07:53:09,083	8571	com.amazonaws.services.glue.connectors.NativeConnectorService$	[main]	 File is spark-avro_2.12-3.3.0-amzn-1.jar
+INFO	2026-01-28T07:53:09,083	8571	com.amazonaws.services.glue.connectors.NativeConnectorService$	[main]	 File Destination  is /opt/aws_glue_connectors/selected/redshift/spark-avro_2.12-3.3.0-amzn-1.jar
+INFO	2026-01-28T07:53:09,085	8573	com.amazonaws.services.glue.connectors.NativeConnectorService$	[main]	Glue connectors: Copy connector /connectors/redshift/new/spark-avro_2.12-3.3.0-amzn-1.jar to /opt/aws_glue_connectors/selected/redshift/spark-avro_2.12-3.3.0-amzn-1.jar
+INFO	2026-01-28T07:53:09,085	8573	com.amazonaws.services.glue.connectors.NativeConnectorService$	[main]	 File is redshift-jdbc42-2.1.0.16.jar
+INFO	2026-01-28T07:53:09,085	8573	com.amazonaws.services.glue.connectors.NativeConnectorService$	[main]	 File Destination  is /opt/aws_glue_connectors/selected/redshift/redshift-jdbc42-2.1.0.16.jar
+INFO	2026-01-28T07:53:09,093	8581	com.amazonaws.services.glue.connectors.NativeConnectorService$	[main]	Glue connectors: Copy connector /connectors/redshift/new/redshift-jdbc42-2.1.0.16.jar to /opt/aws_glue_connectors/selected/redshift/redshift-jdbc42-2.1.0.16.jar
+INFO	2026-01-28T07:53:09,093	8581	com.amazonaws.services.glue.connectors.NativeConnectorService$	[main]	Glue connectors: Copy is finished
+Glue ETL Marketplace - Start ETL connector activation process...
+Glue ETL Marketplace - no connections are attached to job join_bridges_job, no need to download custom connector jar for it.
+Glue ETL Marketplace - Retrieved no ETL connector jars, this may be due to no marketplace/custom connection attached to the job or failure of downloading them, please scroll back to the previous logs to find out the root cause. Container setup continues.
+Glue ETL Marketplace - ETL connector activation process finished, container setup continues...
+Download bucket: steam-dataset-2025-bucket key: glue_scripts/join_bridges.py with usingProxy: false
+Launching ...
+Wed Jan 28 07:53:09 UTC 2026
+/usr/bin/java -cp /tmp:/opt/amazon/conf:/opt/amazon/glue-manifest.jar:/opt/aws_glue_connectors/selected/redshift/*:/opt/aws_glue_connectors/selected/datalake/*::/opt/aws_glue_connectors/selected/marketplace/*:/opt/aws_glue_connectors/selected/downloaded/*:/tmp/* -Dlog4j.configurationFile=/tmp/log4j2.properties -server -Xmx10g -XX:+UseG1GC -XX:MaxHeapFreeRatio=70 -XX:InitiatingHeapOccupancyPercent=45 -XX:OnOutOfMemoryError=/opt/exception_catch/onOOMError.sh %p jr_8bc88906d3a6366e545e8ed8ecb493767f9f1f3866f7abe22ddd44ba94764989 join_bridges_job true true -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/opt/amazon/certs/InternalAndExternalAndAWSTrustStore.jks -Djavax.net.ssl.trustStoreType=JKS -Djavax.net.ssl.trustStorePassword=amazon -DRDS_ROOT_CERT_PATH=/opt/amazon/certs/rds-combined-ca-bundle.pem -DREDSHIFT_ROOT_CERT_PATH=/opt/amazon/certs/redshift-ssl-ca-cert.pem -DRDS_TRUSTSTORE_URL=file:/opt/amazon/certs/RDSTrustStore.jks -Dspark.network.timeout=600 -Dspark.metrics.conf.*.source.jvm.class=org.apache.spark.metrics.source.JvmSource -Dspark.driver.host=10.18.160.133 -Dspark.cloudwatch.logging.conf.jobRunId=jr_8bc88906d3a6366e545e8ed8ecb493767f9f1f3866f7abe22ddd44ba94764989 -Dspark.driver.cores=4 -Dspark.eventLog.enabled=true -Dspark.metrics.conf.*.source.system.class=org.apache.spark.metrics.source.SystemMetricsSource -Dspark.sql.shuffle.partitions=4 -Dspark.metrics.conf.driver.source.throughput.class=org.apache.spark.metrics.source.ThroughputMetricsSource -Dspark.sql.parquet.output.committer.class=com.amazon.emr.committer.EmrOptimizedSparkSqlParquetOutputCommitter -Dspark.glue.enable-job-insights=true -Dspark.metrics.conf.*.source.AWSDILyra.class=org.apache.spark.metrics.source.AWSDILyraSource  -Dspark.metrics.conf.*.sink.GlueCloudwatch.glueVersion=4.0 -Dspark.sparkmeasure.printToStdout=false -Dspark.hadoop.aws.glue.endpoint=https://glue.us-east-1.amazonaws.com -Dspark.glueExceptionAnalysisEventLog.dir=/tmp/glue-exception-analysis-logs/ -Dspark.glue.GLUE_VERSION=4.0 -Dspark.app.name=nativespark-join_bridges_job-jr_8bc88906d3a6366e545e8ed8ecb493767f9f1f3866f7abe22ddd44ba94764989 -Dspark.hadoop.mapred.output.direct.EmrFileSystem=true -Dspark.glue.GLUE_TASK_GROUP_ID=tg-032f3ce58073d7cf9f440b5d8b7c9d523134807d_cell3 -Dspark.glueJobInsights.enabled=true -Dspark.glue.USE_PROXY=false -Dspark.eventLog.dir=/tmp/spark-event-logs/ -Dspark.hadoop.fs.s3.impl=com.amazon.ws.emr.hadoop.fs.EmrFileSystem -Dspark.hadoop.hive.metastore.warehouse.dir=/tmp/spark-warehouse -Dspark.hadoop.fs.s3a.connection.maximum=500 -Dspark.glue.nativeconnectors= -Dspark.glue.enable-continuous-cloudwatch-log=false -Dspark.hadoop.mapred.output.direct.NativeS3FileSystem=true -Dspark.pyspark.python=/usr/bin/python3 -Dspark.hadoop.hive.metastore.client.factory.class=com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory -Dspark.metrics.conf.driver.source.glue.jobPerformance.class=org.apache.spark.metrics.source.PerformanceMetricsSource -Dspark.hadoop.mapreduce.fileoutputcommitter.algorithm.version=2 -Dspark.hadoop.glue.michiganCredentialsProviderProxy=com.amazonaws.services.glue.remote.LakeformationCredentialsProvider -Dspark.metrics.conf.driver.source.aggregate.class=org.apache.spark.metrics.source.AggregateMetricsSource -Dspark.dynamicAllocation.maxExecutors=1 -Dspark.glue.endpoint=https://glue-jes-prod.us-east-1.amazonaws.com -Dspark.sql.catalogImplementation=hive -Dspark.ui.enabled=false -Dspark.driver.extraClassPath=/tmp:/opt/amazon/conf:/opt/amazon/glue-manifest.jar -Dspark.executor.instances=1 -Dspark.script.location=s3://steam-dataset-2025-bucket/glue_scripts/join_bridges.py -Dspark.metrics.conf.*.sink.GlueCloudwatch.jobRunId=jr_8bc88906d3a6366e545e8ed8ecb493767f9f1f3866f7abe22ddd44ba94764989 -Dspark.metrics.conf.driver.source.glue.resourceUtilization.class=org.apache.spark.metrics.source.ResourceUtilizationMetricsSource -Dspark.default.parallelism=4 -Dspark.glue.scriptName=join_bridges.py -Dspark.authenticate=true -Dspark.dynamicAllocation.enabled=false -Dspark.shuffle.service.enabled=false -Dspark.hadoop.mapred.output.committer.class=org.apache.hadoop.mapred.DirectOutputCommitter -Dspark.executor.extraClassPath=/tmp:/opt/amazon/conf:/opt/amazon/glue-manifest.jar -Dspark.sparkmeasure.outputFormat=json  -Dspark.metrics.conf.*.source.glue.verticalScaling.class=org.apache.spark.metrics.source.VerticalScalingMetricsSource -Dspark.executor.cores=4 -Dspark.hadoop.lakeformation.credentials.url=http://localhost:9998/lakeformationcredentials -Dspark.metrics.conf.*.sink.GlueCloudwatch.legacyMetrics=true -Dspark.glue.JOB_RUN_ID=jr_8bc88906d3a6366e545e8ed8ecb493767f9f1f3866f7abe22ddd44ba94764989 -Dspark.glue.JOB_NAME=join_bridges_job -Dspark.datasource.redshift.community.trace_id=jr_8bc88906d3a6366e545e8ed8ecb493767f9f1f3866f7abe22ddd44ba94764989 -Dspark.glue.enable-observability-metrics=true -Dspark.metrics.conf.driver.source.glue.jobPerformance.skewnessFactor=5 -Dspark.hadoop.fs.s3.maxConnections=500 -Dspark.sql.parquet.fs.optimized.committer.optimization-enabled=true -Dspark.rpc.askTimeout=600 -Dspark.authenticate.secret=<HIDDEN> -Dspark.metrics.conf.*.source.s3.class=org.apache.spark.metrics.source.S3FileSystemSource -Dspark.metrics.conf.*.sink.AWSDILyra.class=org.apache.spark.metrics.sink.AWSDILyraSink -Dspark.extraListeners=com.amazonaws.services.glueexceptionanalysis.GlueExceptionAnalysisListener,com.amazonaws.services.gluedi.sensei.autodebugging.AutoDebuggingListener,glue.ch.cern.sparkmeasure.FlightRecorderStageMetrics,glue.ch.cern.sparkmeasure.FlightRecorderTaskMetrics -Dspark.metrics.conf.*.sink.GlueCloudwatch.namespace=Glue -Dspark.executor.memory=10g -Dspark.metrics.conf.*.sink.GlueCloudwatch.jobName=join_bridges_job -Dspark.metrics.conf.*.sink.GlueCloudwatch.class=org.apache.spark.metrics.sink.GlueCloudwatchSink -Dspark.driver.memory=10g -Dspark.hadoop.fs.s3.buffer.dir=/tmp/hadoop-spark/s3 -Dspark.glue.GLUE_COMMAND_CRITERIA=glueetl -Dspark.master=jes -Dspark.hadoop.mapreduce.fileoutputcommitter.marksuccessfuljobs=false -Dspark.unsafe.sorter.spill.read.ahead.enabled=false -Dspark.hadoop.parquet.enable.summary-metadata=false  -Dspark.glueAppInsightsLog.dir=/tmp/glue-app-insights-logs/ -Dspark.glue.jobLanguage=python -Dspark.files.overwrite=true  com.amazonaws.services.glue.ProcessLauncher --launch-class org.apache.spark.deploy.PythonRunner /opt/amazon/bin/runscript.py  /tmp/join_bridges.py true --job-bookmark-option job-bookmark-disable --JOB_ID j_22018514746d12c3bf048f9a2983f6e8563224c29b6a7fcc0f05840f0c17a43a true --enable-spark-ui true --spark-event-logs-path s3://steamaws-glue-assets-561406826670-us-east-1/sparkHistoryLogs/ --JOB_RUN_ID jr_8bc88906d3a6366e545e8ed8ecb493767f9f1f3866f7abe22ddd44ba94764989 --JOB_NAME join_bridges_job --enable-spark-ui-legacy-path true --TempDir s3://aws-glue-assets-561406826670-us-east-1/temporary/
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/opt/amazon/spark/jars/log4j-slf4j-impl-2.17.2.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/opt/amazon/spark/jars/slf4j-reload4j-1.7.36.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/opt/amazon/lib/Log4j-slf4j-2.x.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/opt/amazon/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.apache.logging.slf4j.Log4jLoggerFactory]
+Continuous Logging: Creating cloudwatch appender with AWSRegion us-east-1, AWSLogGroup /aws-glue/jobs/logs-v2, AWSLogStream jr_8bc88906d3a6366e545e8ed8ecb493767f9f1f3866f7abe22ddd44ba94764989-job-insights-rca, flushInterval(sec) 5, maxRetries 5
+Continuous Logging: Creating cloudwatch appender with AWSRegion us-east-1, AWSLogGroup /aws-glue/jobs/logs-v2, AWSLogStream jr_8bc88906d3a6366e545e8ed8ecb493767f9f1f3866f7abe22ddd44ba94764989-job-insights-rule, flushInterval(sec) 5, maxRetries 5
+2026-01-28 07:53:17,860 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): ==== Netty Server Started ====
+2026-01-28 07:53:17,864 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 07:53:17.863 [main] INFO  [] com.amazonaws.gluejob.app.GlueJobEventsInputHandler - Initialized events handler
+2026-01-28 07:53:17,867 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): input rulesFilePath=/tmp/glue_app_analyzer_rules
+2026-01-28 07:53:17,880 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 07:53:17.873 [pool-3-thread-1] ERROR [] com.amazonaws.gluejob.utils.FileUtils - Error getting file with getResourceAsStream 
+2026-01-28 07:53:17,880 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): java.lang.NullPointerException: null
+2026-01-28 07:53:17,880 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 	at java.io.Reader.<init>(Reader.java:78) ~[?:1.8.0_472]
+2026-01-28 07:53:17,880 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 	at java.io.InputStreamReader.<init>(InputStreamReader.java:97) ~[?:1.8.0_472]
+2026-01-28 07:53:17,880 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 	at com.amazonaws.gluejob.utils.FileUtils.readCsvFile(FileUtils.java:25) ~[AWSGlueJobLogsAnalysisLib.jar:?]
+2026-01-28 07:53:17,880 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 	at com.amazonaws.gluejob.utils.rules_generator.DroolsRuleGenerator.readCsvToGenerateDrools(DroolsRuleGenerator.java:34) ~[AWSGlueJobLogsAnalysisLib.jar:?]
+2026-01-28 07:53:17,881 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 	at com.amazonaws.gluejob.app.GlueJobEventsInputHandler.run(GlueJobEventsInputHandler.scala:36) ~[AWSGlueJobLogsAnalysisLib.jar:?]
+2026-01-28 07:53:17,881 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149) ~[?:1.8.0_472]
+2026-01-28 07:53:17,881 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624) ~[?:1.8.0_472]
+2026-01-28 07:53:17,881 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 	at java.lang.Thread.run(Thread.java:750) ~[?:1.8.0_472]
+2026-01-28 07:53:17,881 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 07:53:17.880 [pool-3-thread-1] INFO  [] com.amazonaws.gluejob.utils.FileUtils - Reading file using thread context class loader FailureAnalysisRules.csv
+2026-01-28 07:53:18,009 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 07:53:18.009 [pool-3-thread-1] INFO  [] com.amazonaws.gluejob.drools.RulesEngineConfig - Loaded Drools Files : [com.amazonaws.gluejob.drools.RulesEngineFactory$FilesystemBasedRulesFile@29b3283f, com.amazonaws.gluejob.drools.RulesEngineFactory$FilesystemBasedRulesFile@2a34b259, com.amazonaws.gluejob.drools.RulesEngineFactory$FilesystemBasedRulesFile@70471153, com.amazonaws.gluejob.drools.RulesEngineFactory$FilesystemBasedRulesFile@19bf41c3, com.amazonaws.gluejob.drools.RulesEngineFactory$FilesystemBasedRulesFile@29fd601b, com.amazonaws.gluejob.drools.RulesEngineFactory$FilesystemBasedRulesFile@2654a907, com.amazonaws.gluejob.drools.RulesEngineFactory$FilesystemBasedRulesFile@6e51f917, com.amazonaws.gluejob.drools.RulesEngineFactory$FilesystemBasedRulesFile@d031c47, com.amazonaws.gluejob.drools.RulesEngineFactory$FilesystemBasedRulesFile@4fbc4844, com.amazonaws.gluejob.drools.RulesEngineFactory$FilesystemBasedRulesFile@4ca3dc25, com.amazonaws.gluejob.drools.RulesEngineFactory$FilesystemBasedRulesFile@2ddb1de7]
+2026-01-28 07:53:18,573 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 07:53:18.573 [pool-3-thread-1] INFO  [] com.amazonaws.gluejob.drools.DroolsRulesEngine - Loading drools rule file: /tmp/rules_generated_from_csv/Module_Not_Found_Error.drl
+2026-01-28 07:53:18,576 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 07:53:18.576 [pool-3-thread-1] INFO  [] com.amazonaws.gluejob.drools.DroolsRulesEngine - Loading drools rule file: /tmp/rules_generated_from_csv/Arithmetic_Exception_in_Glue_job.drl
+2026-01-28 07:53:18,576 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 07:53:18.576 [pool-3-thread-1] INFO  [] com.amazonaws.gluejob.drools.DroolsRulesEngine - Loading drools rule file: /tmp/rules_generated_from_csv/Analysis_Exception_Cannot_Resolve.drl
+2026-01-28 07:53:18,576 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 07:53:18.576 [pool-3-thread-1] INFO  [] com.amazonaws.gluejob.drools.DroolsRulesEngine - Loading drools rule file: /tmp/rules_generated_from_csv/JDBC_connection_failed.drl
+2026-01-28 07:53:18,577 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 07:53:18.576 [pool-3-thread-1] INFO  [] com.amazonaws.gluejob.drools.DroolsRulesEngine - Loading drools rule file: /tmp/rules_generated_from_csv/Data_with_invalid_value.drl
+2026-01-28 07:53:18,577 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 07:53:18.576 [pool-3-thread-1] INFO  [] com.amazonaws.gluejob.drools.DroolsRulesEngine - Loading drools rule file: /tmp/rules_generated_from_csv/OOM_on_driver_no_heap_space_with_G2X.drl
+2026-01-28 07:53:18,577 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 07:53:18.577 [pool-3-thread-1] INFO  [] com.amazonaws.gluejob.drools.DroolsRulesEngine - Loading drools rule file: /tmp/rules_generated_from_csv/OOM_on_driver_no_heap_space_non_G2X.drl
+2026-01-28 07:53:18,577 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 07:53:18.577 [pool-3-thread-1] INFO  [] com.amazonaws.gluejob.drools.DroolsRulesEngine - Loading drools rule file: /tmp/rules_generated_from_csv/Missing_required_glue_argument.drl
+2026-01-28 07:53:18,577 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 07:53:18.577 [pool-3-thread-1] INFO  [] com.amazonaws.gluejob.drools.DroolsRulesEngine - Loading drools rule file: /tmp/rules_generated_from_csv/Missing_optional_dependency_XLRD.drl
+2026-01-28 07:53:18,578 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 07:53:18.577 [pool-3-thread-1] INFO  [] com.amazonaws.gluejob.drools.DroolsRulesEngine - Loading drools rule file: /tmp/rules_generated_from_csv/Type_error_on_endpoint_config.drl
+2026-01-28 07:53:18,578 INFO [Thread-8] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): 07:53:18.577 [pool-3-thread-1] INFO  [] com.amazonaws.gluejob.drools.DroolsRulesEngine - Loading drools rule file: /tmp/rules_generated_from_csv/Name_error_in_glue_app.drl
+2026-01-28 07:53:20,670 INFO [Thread-14] spark.SparkContext (Logging.scala:logInfo(61)): Running Spark version 3.3.0-amzn-1
+2026-01-28 07:53:20,704 INFO [Thread-14] resource.ResourceUtils (Logging.scala:logInfo(61)): ==============================================================
+2026-01-28 07:53:20,704 INFO [Thread-14] resource.ResourceUtils (Logging.scala:logInfo(61)): No custom resources configured for spark.driver.
+2026-01-28 07:53:20,705 INFO [Thread-14] resource.ResourceUtils (Logging.scala:logInfo(61)): ==============================================================
+2026-01-28 07:53:20,706 INFO [Thread-14] spark.SparkContext (Logging.scala:logInfo(61)): Submitted application: nativespark-join_bridges_job-jr_8bc88906d3a6366e545e8ed8ecb493767f9f1f3866f7abe22ddd44ba94764989
+2026-01-28 07:53:20,733 INFO [Thread-14] resource.ResourceProfile (Logging.scala:logInfo(61)): Default ResourceProfile created, executor resources: Map(cores -> name: cores, amount: 4, script: , vendor: , memory -> name: memory, amount: 10240, script: , vendor: , offHeap -> name: offHeap, amount: 0, script: , vendor: ), task resources: Map(cpus -> name: cpus, amount: 1.0)
+2026-01-28 07:53:20,757 INFO [Thread-14] resource.ResourceProfile (Logging.scala:logInfo(61)): Limiting resource is cpus at 4 tasks per executor
+2026-01-28 07:53:20,760 INFO [Thread-14] resource.ResourceProfileManager (Logging.scala:logInfo(61)): Added ResourceProfile id: 0
+2026-01-28 07:53:20,836 INFO [Thread-14] spark.SecurityManager (Logging.scala:logInfo(61)): Changing view acls to: spark
+2026-01-28 07:53:20,837 INFO [Thread-14] spark.SecurityManager (Logging.scala:logInfo(61)): Changing modify acls to: spark
+2026-01-28 07:53:20,837 INFO [Thread-14] spark.SecurityManager (Logging.scala:logInfo(61)): Changing view acls groups to: 
+2026-01-28 07:53:20,838 INFO [Thread-14] spark.SecurityManager (Logging.scala:logInfo(61)): Changing modify acls groups to: 
+2026-01-28 07:53:20,839 INFO [Thread-14] spark.SecurityManager (Logging.scala:logInfo(61)): SecurityManager: authentication enabled; ui acls disabled; users  with view permissions: Set(spark); groups with view permissions: Set(); users  with modify permissions: Set(spark); groups with modify permissions: Set()
+2026-01-28 07:53:21,214 INFO [Thread-14] util.Utils (Logging.scala:logInfo(61)): Successfully started service 'sparkDriver' on port 36185.
+2026-01-28 07:53:21,252 INFO [Thread-14] spark.SparkEnv (Logging.scala:logInfo(61)): Registering MapOutputTracker
+2026-01-28 07:53:21,294 INFO [Thread-14] spark.SparkEnv (Logging.scala:logInfo(61)): Registering BlockManagerMaster
+2026-01-28 07:53:21,322 INFO [Thread-14] storage.BlockManagerMasterEndpoint (Logging.scala:logInfo(61)): Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+2026-01-28 07:53:21,322 INFO [Thread-14] storage.BlockManagerMasterEndpoint (Logging.scala:logInfo(61)): BlockManagerMasterEndpoint up
+2026-01-28 07:53:21,326 INFO [Thread-14] spark.SparkEnv (Logging.scala:logInfo(61)): Registering BlockManagerMasterHeartbeat
+2026-01-28 07:53:21,343 INFO [Thread-14] storage.DiskBlockManager (Logging.scala:logInfo(61)): Created local directory at /tmp/blockmgr-88c604d1-7a46-48fc-9201-6688774d322f
+2026-01-28 07:53:21,365 INFO [Thread-14] memory.MemoryStore (Logging.scala:logInfo(61)): MemoryStore started with capacity 5.8 GiB
+2026-01-28 07:53:21,383 INFO [Thread-14] spark.SparkEnv (Logging.scala:logInfo(61)): Registering OutputCommitCoordinator
+2026-01-28 07:53:21,387 INFO [Thread-14] subresultcache.SubResultCacheManager (Logging.scala:logInfo(61)): Sub-result caches are disabled.
+2026-01-28 07:53:21,507 INFO [Thread-14] scheduler.JESSchedulerBackend$JESAsSchedulerBackendEndpoint (Logging.scala:logInfo(61)): JESAsSchedulerBackendEndpoint
+2026-01-28 07:53:21,516 INFO [Thread-14] scheduler.JESSchedulerBackend (Logging.scala:logInfo(61)): JESSchedulerBackend
+2026-01-28 07:53:21,532 INFO [Thread-14] scheduler.JESSchedulerBackend (JESClusterManager.scala:<init>(231)): JESClusterManager: Initializing JES client with proxy: host: null, port: -1
+2026-01-28 07:53:21,832 INFO [Thread-14] util.Utils (Logging.scala:logInfo(61)): Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 36763.
+2026-01-28 07:53:21,832 INFO [Thread-14] netty.NettyBlockTransferService (NettyBlockTransferService.scala:init(82)): Server created on 10.18.160.133:36763
+2026-01-28 07:53:21,834 INFO [Thread-14] storage.BlockManager (Logging.scala:logInfo(61)): Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+2026-01-28 07:53:21,835 INFO [allocator] glue.TaskGroupInterface (Logging.scala:logInfo(61)): creating executor task for executor 1; clientToken gr_tg-032f3ce58073d7cf9f440b5d8b7c9d523134807d_cell3_e_1_a_spark-application-1769586801468
+2026-01-28 07:53:21,847 INFO [Thread-14] storage.BlockManagerMaster (Logging.scala:logInfo(61)): Registering BlockManager BlockManagerId(driver, 10.18.160.133, 36763, None)
+2026-01-28 07:53:21,865 INFO [dispatcher-BlockManagerMaster] storage.BlockManagerMasterEndpoint (Logging.scala:logInfo(61)): Registering block manager 10.18.160.133:36763 with 5.8 GiB RAM, BlockManagerId(driver, 10.18.160.133, 36763, None)
+2026-01-28 07:53:21,875 INFO [Thread-14] storage.BlockManagerMaster (Logging.scala:logInfo(61)): Registered BlockManager BlockManagerId(driver, 10.18.160.133, 36763, None)
+2026-01-28 07:53:21,882 INFO [Thread-14] storage.BlockManager (Logging.scala:logInfo(61)): Initialized BlockManager: BlockManagerId(driver, 10.18.160.133, 36763, None)
+2026-01-28 07:53:22,084 INFO [Thread-14] sink.GlueCloudwatchSink (GlueCloudwatchSink.scala:<init>(57)): GlueCloudwatchSink: get cloudwatch client using proxy: host null, port -1
+2026-01-28 07:53:22,216 INFO [Thread-14] sink.GlueCloudwatchSink (AWSDILyraSink.scala:logInfo(16)): CloudwatchSink: Obtained credentials from the Instance Profile
+2026-01-28 07:53:22,278 INFO [Thread-14] sink.GlueCloudwatchSink (AWSDILyraSink.scala:logInfo(16)): CloudwatchSink: jobName: join_bridges_job jobRunId: jr_8bc88906d3a6366e545e8ed8ecb493767f9f1f3866f7abe22ddd44ba94764989
+2026-01-28 07:53:22,377 INFO [Thread-14] history.SingleEventLogFileWriter (Logging.scala:logInfo(61)): Logging events to file:/tmp/spark-event-logs/spark-application-1769586801468.inprogress
+2026-01-28 07:53:22,685 INFO [Thread-14] glueexceptionanalysis.EventLogFileWriter (FileWriter.scala:start(51)): Started file writer for com.amazonaws.services.glueexceptionanalysis.EventLogFileWriter
+2026-01-28 07:53:22,704 INFO [Thread-14] glueexceptionanalysis.EventLogSocketWriter (SocketWriter.scala:start(34)): Socket client for com.amazonaws.services.glueexceptionanalysis.EventLogSocketWriter started correctly
+2026-01-28 07:53:22,780 INFO [Thread-14] autodebugging.AutoDebuggingEventLogFileWriter (AutoDebuggingEventLogFileWriter.scala:start(62)): Started file writer.
+2026-01-28 07:53:22,789 INFO [Thread-14] sparkmeasure.FlightRecorderStageMetrics (Utils.scala:parseMetricsFormat(173)): Using json as serialization format.
+2026-01-28 07:53:22,789 INFO [Thread-14] sparkmeasure.FlightRecorderStageMetrics (Utils.scala:parseMetricsFilename(195)): Writing output to /tmp/stageMetrics_flightRecorder
+2026-01-28 07:53:22,792 INFO [Thread-14] sparkmeasure.FlightRecorderTaskMetrics (Utils.scala:parseMetricsFormat(173)): Using json as serialization format.
+2026-01-28 07:53:22,793 INFO [Thread-14] sparkmeasure.FlightRecorderTaskMetrics (Utils.scala:parseMetricsFilename(195)): Writing output to /tmp/taskMetrics_flightRecorder
+2026-01-28 07:53:22,794 INFO [Thread-14] spark.SparkContext (Logging.scala:logInfo(61)): Registered listener com.amazonaws.services.glueexceptionanalysis.GlueExceptionAnalysisListener
+2026-01-28 07:53:22,794 INFO [Thread-14] spark.SparkContext (Logging.scala:logInfo(61)): Registered listener com.amazonaws.services.gluedi.sensei.autodebugging.AutoDebuggingListener
+2026-01-28 07:53:22,795 INFO [Thread-14] spark.SparkContext (Logging.scala:logInfo(61)): Registered listener glue.ch.cern.sparkmeasure.FlightRecorderStageMetrics
+2026-01-28 07:53:22,795 INFO [Thread-14] spark.SparkContext (Logging.scala:logInfo(61)): Registered listener glue.ch.cern.sparkmeasure.FlightRecorderTaskMetrics
+2026-01-28 07:53:22,855 INFO [Thread-14] scheduler.JESSchedulerBackend (Logging.scala:logInfo(61)): getDriverLogUrls Map()
+2026-01-28 07:53:22,936 INFO [allocator] glue.TaskGroupInterface (Logging.scala:logInfo(61)): createChildTask API response code 200
+2026-01-28 07:53:22,937 INFO [allocator] glue.ExecutorTaskManagement (Logging.scala:logInfo(61)): executor task g-12f14a6cf24a2a908ac52c78c6ae2e064cea8949_cell3 created for executor 1
+2026-01-28 07:53:22,986 INFO [Thread-14] util.log (Log.java:initialized(170)): Logging initialized @13360ms to org.sparkproject.jetty.util.log.Slf4jLog
+2026-01-28 07:53:23,025 INFO [Thread-14] scheduler.JESSchedulerBackend (Logging.scala:logInfo(61)): SchedulerBackend is ready for scheduling beginning after reached minRegisteredResourcesRatio: 0.0
+2026-01-28 07:53:23,591 INFO [Thread-14] glue.GlueContext (GlueContext.scala:<init>(123)): GlueMetrics configured and enabled
+2026-01-28 07:53:23,594 INFO [Thread-14] source.ObservabilityTaskInfoRecorderListener (ObservabilityMetricsUpdater.scala:<init>(28)): ThroughputMetricsSource is initiated
+2026-01-28 07:53:23,596 INFO [Thread-14] source.ObservabilityTaskInfoRecorderListener (ObservabilityMetricsUpdater.scala:<init>(53)): ResourceUtilizationMetricsSource is initiated
+2026-01-28 07:53:23,598 INFO [Thread-14] source.StageSkewness (PerformanceMetricsSource.scala:<init>(29)): [Observability] Skewness metric using Skewness Factor = 5
+2026-01-28 07:53:23,599 INFO [Thread-14] source.ObservabilityTaskInfoRecorderListener (ObservabilityMetricsUpdater.scala:<init>(68)): PerformanceMetricsSource is initiated
+2026-01-28 07:53:23,599 INFO [Thread-14] glue.GlueContext (GlueContext.scala:<init>(131)): ObservabilityMetrics configured and enabled
+2026-01-28 07:53:23,664 INFO [Thread-14] lzo.GPLNativeCodeLoader (GPLNativeCodeLoader.java:<clinit>(34)): Loaded native gpl library
+2026-01-28 07:53:23,681 INFO [Thread-14] lzo.LzoCodec (LzoCodec.java:<clinit>(76)): Successfully loaded & initialized native-lzo library [hadoop-lzo rev 049362b7cf53ff5f739d6b1532457f2c6cd495e8]
+2026-01-28 07:53:23,710 INFO [Thread-14] util.Job$ (Job.scala:runId(97)): runId Method is Invoked 
+2026-01-28 07:53:23,710 INFO [Thread-14] util.Job$ (Job.scala:runId(106)): Job run ID under runId method is jr_8bc88906d3a6366e545e8ed8ecb493767f9f1f3866f7abe22ddd44ba94764989 
+2026-01-28 07:53:23,748 INFO [Thread-14] util.FileListPersistence (FileListPersistence.scala:<init>(34)): create FileListPersistence with conf: fs.s3.serverSideEncryption.kms.keyId: None
+2026-01-28 07:53:23,781 INFO [Thread-14] util.AvroReaderUtil$ (AvroReaderUtil.scala:getFieldParser(245)): Creating default Avro field parser for version 1.7.
+2026-01-28 07:53:24,013 INFO [Thread-14] memory.MemoryStore (Logging.scala:logInfo(61)): Block broadcast_0 stored as values in memory (estimated size 362.0 KiB, free 5.8 GiB)
+2026-01-28 07:53:24,088 INFO [Thread-14] memory.MemoryStore (Logging.scala:logInfo(61)): Block broadcast_0_piece0 stored as bytes in memory (estimated size 33.7 KiB, free 5.8 GiB)
+2026-01-28 07:53:24,092 INFO [dispatcher-BlockManagerMaster] storage.BlockManagerInfo (Logging.scala:logInfo(61)): Added broadcast_0_piece0 in memory on 10.18.160.133:36763 (size: 33.7 KiB, free: 5.8 GiB)
+2026-01-28 07:53:24,098 INFO [Thread-14] spark.SparkContext (Logging.scala:logInfo(61)): Created broadcast 0 from broadcast at DynamoConnection.scala:52
+2026-01-28 07:53:24,115 INFO [Thread-14] memory.MemoryStore (Logging.scala:logInfo(61)): Block broadcast_1 stored as values in memory (estimated size 362.0 KiB, free 5.8 GiB)
+2026-01-28 07:53:24,129 INFO [Thread-14] memory.MemoryStore (Logging.scala:logInfo(61)): Block broadcast_1_piece0 stored as bytes in memory (estimated size 33.7 KiB, free 5.8 GiB)
+2026-01-28 07:53:24,131 INFO [dispatcher-BlockManagerMaster] storage.BlockManagerInfo (Logging.scala:logInfo(61)): Added broadcast_1_piece0 in memory on 10.18.160.133:36763 (size: 33.7 KiB, free: 5.8 GiB)
+2026-01-28 07:53:24,132 INFO [Thread-14] spark.SparkContext (Logging.scala:logInfo(61)): Created broadcast 1 from broadcast at DynamoConnection.scala:52
+2026-01-28 07:53:24,135 INFO [Thread-14] util.JobBookmark$ (JobBookmarkUtils.scala:configure(66)): jobbookmark is not enabled, do not init AWSGlueJobBookMarkService
+2026-01-28 07:53:24,177 INFO [main] glue.ProcessLauncher (Logging.scala:logInfo(61)): postprocessing
+2026-01-28 07:53:24,177 INFO [main] glue.ProcessLauncher (ProcessLauncher.scala:enhanceFailureReason(771)): Enhance failure reason and emit cloudwatch error metrics.
+2026-01-28 07:53:24,185 DEBUG [main] glue.ProcessLauncher (ProcessLauncher.scala:enhanceFailureReason(776)): Original failureReason: 
+2026-01-28 07:53:24,185 DEBUG [main] glue.ProcessLauncher (ProcessLauncher.scala:enhanceFailureReason(777)): exceptionErrorMessage is: 
+2026-01-28 07:53:24,201 INFO [main] glue.CloudWatchMetricsEmitter (CloudWatchMetricsEmitter.scala:$anonfun$emitErrorMetrics$2(34)): Emit job error metrics
+2026-01-28 07:53:24,298 INFO [main] glue.AnalyzerLogHelper$ (Logging.scala:logInfo(24)): Analyzer stopped
+2026-01-28 07:53:24,310 INFO [main] glue.LogPusher (Logging.scala:logInfo(61)): stopping
+2026-01-28 07:53:24,312 INFO [main] glue.ProcessLauncher (Logging.scala:logInfo(61)): postprocessing finished
+Continuous Logging: Shutting down cloudwatch appender.
+
+2026-01-28 07:53:24,334 INFO [shutdown-hook-0] spark.SparkContext (Logging.scala:logInfo(61)): Invoking stop() from shutdown hook
+Continuous Logging: Shutting down cloudwatch appender.
+2026-01-28 07:53:24,348 INFO [shutdown-hook-0] scheduler.JESSchedulerBackend (Logging.scala:logInfo(61)): Shutting down all executors
+2026-01-28 07:53:24,356 INFO [dispatcher-CoarseGrainedScheduler] scheduler.JESSchedulerBackend$JESAsSchedulerBackendEndpoint (Logging.scala:logInfo(61)): Asking each executor to shut down
+2026-01-28 07:53:24,358 INFO [spark-listener-group-shared] glueexceptionanalysis.EventLogFileWriter (FileWriter.scala:stop(70)): Logs, events processed and insights are written to file /tmp/glue-exception-analysis-logs/spark-application-1769586801468
+2026-01-28 07:53:24,373 INFO [spark-listener-group-shared] sparkmeasure.FlightRecorderStageMetrics (FlightRecorder.scala:onApplicationEnd(43)): Spark application ended, timestamp = 1769586804335
+2026-01-28 07:53:24,374 WARN [spark-listener-group-shared] sparkmeasure.FlightRecorderStageMetrics (FlightRecorder.scala:onApplicationEnd(57)): Writing Stage Metrics data serialized as json to /tmp/stageMetrics_flightRecorder
+2026-01-28 07:53:24,398 INFO [spark-listener-group-shared] sparkmeasure.FlightRecorderTaskMetrics (FlightRecorder.scala:onApplicationEnd(102)): Spark application ended, timestamp = 1769586804335
+2026-01-28 07:53:24,398 INFO [spark-listener-group-shared] sparkmeasure.FlightRecorderTaskMetrics (FlightRecorder.scala:onApplicationEnd(116)): Writing Task Metrics data serialized as json to /tmp/taskMetrics_flightRecorder
+2026-01-28 07:53:24,409 INFO [dispatcher-event-loop-0] spark.MapOutputTrackerMasterEndpoint (Logging.scala:logInfo(61)): MapOutputTrackerMasterEndpoint stopped!
+2026-01-28 07:53:24,421 INFO [shutdown-hook-0] memory.MemoryStore (Logging.scala:logInfo(61)): MemoryStore cleared
+2026-01-28 07:53:24,422 INFO [shutdown-hook-0] storage.BlockManager (Logging.scala:logInfo(61)): BlockManager stopped
+2026-01-28 07:53:24,432 INFO [shutdown-hook-0] storage.BlockManagerMaster (Logging.scala:logInfo(61)): BlockManagerMaster stopped
+2026-01-28 07:53:24,567 INFO [dispatcher-event-loop-0] scheduler.OutputCommitCoordinator$OutputCommitCoordinatorEndpoint (Logging.scala:logInfo(61)): OutputCommitCoordinator stopped!
+2026-01-28 07:53:24,582 INFO [shutdown-hook-0] spark.SparkContext (Logging.scala:logInfo(61)): Successfully stopped SparkContext
+2026-01-28 07:53:24,583 INFO [shutdown-hook-0] glue.LogPusher (Logging.scala:logInfo(61)): uploading /tmp/spark-event-logs/ to s3://steamaws-glue-assets-561406826670-us-east-1/sparkHistoryLogs/
+2026-01-28 07:53:25,496 ERROR [shutdown-hook-0] glue.LogPusher (Logging.scala:logError(98)): com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.services.s3.model.AmazonS3Exception: The specified bucket does not exist (Service: Amazon S3; Status Code: 404; Error Code: NoSuchBucket; Request ID: EGC24XD9MH609GPE; S3 Extended Request ID: roPc8HDwsRmLUhU7XkKQc1e0a0Bq/5VMz+1pifRNVqUyNwAayDmuVA4tm1GMVAQ7kYQP6WBzkHU=; Proxy: null), S3 Extended Request ID: roPc8HDwsRmLUhU7XkKQc1e0a0Bq/5VMz+1pifRNVqUyNwAayDmuVA4tm1GMVAQ7kYQP6WBzkHU=
+java.io.IOException: com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.services.s3.model.AmazonS3Exception: The specified bucket does not exist (Service: Amazon S3; Status Code: 404; Error Code: NoSuchBucket; Request ID: EGC24XD9MH609GPE; S3 Extended Request ID: roPc8HDwsRmLUhU7XkKQc1e0a0Bq/5VMz+1pifRNVqUyNwAayDmuVA4tm1GMVAQ7kYQP6WBzkHU=; Proxy: null), S3 Extended Request ID: roPc8HDwsRmLUhU7XkKQc1e0a0Bq/5VMz+1pifRNVqUyNwAayDmuVA4tm1GMVAQ7kYQP6WBzkHU=
+	at com.amazon.ws.emr.hadoop.fs.s3n.Jets3tNativeFileSystemStore.list(Jets3tNativeFileSystemStore.java:423) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.s3n.Jets3tNativeFileSystemStore.isFolderUsingFolderObject(Jets3tNativeFileSystemStore.java:249) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.s3n.Jets3tNativeFileSystemStore.isFolder(Jets3tNativeFileSystemStore.java:212) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.s3n.S3NativeFileSystem.getFileStatus(S3NativeFileSystem.java:529) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at org.apache.hadoop.fs.FileUtil.checkDest(FileUtil.java:515) ~[hadoop-client-api-3.3.3-amzn-0.jar:?]
+	at org.apache.hadoop.fs.FileUtil.copy(FileUtil.java:401) ~[hadoop-client-api-3.3.3-amzn-0.jar:?]
+	at org.apache.hadoop.fs.FileUtil.copy(FileUtil.java:391) ~[hadoop-client-api-3.3.3-amzn-0.jar:?]
+	at org.apache.hadoop.fs.FileSystem.copyFromLocalFile(FileSystem.java:2543) ~[hadoop-client-api-3.3.3-amzn-0.jar:?]
+	at org.apache.hadoop.fs.FileSystem.copyFromLocalFile(FileSystem.java:2509) ~[hadoop-client-api-3.3.3-amzn-0.jar:?]
+	at org.apache.hadoop.fs.FileSystem.copyFromLocalFile(FileSystem.java:2472) ~[hadoop-client-api-3.3.3-amzn-0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.EmrFileSystem.copyFromLocalFile(EmrFileSystem.java:518) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazonaws.services.glue.LogPusher.upload(LogPusher.scala:72) ~[AWSGlueSparkResourceManager-1.0.jar:?]
+	at org.apache.spark.util.ShutdownHookManagerWrapper$.$anonfun$addLogPusherHook$2(ShutdownHookManagerWrapper.scala:10) ~[AWSGlueSparkResourceManager-1.0.jar:3.3.0-amzn-1]
+	at org.apache.spark.util.ShutdownHookManagerWrapper$.$anonfun$addLogPusherHook$2$adapted(ShutdownHookManagerWrapper.scala:10) ~[AWSGlueSparkResourceManager-1.0.jar:3.3.0-amzn-1]
+	at scala.Option.foreach(Option.scala:407) ~[scala-library-2.12.15.jar:?]
+	at org.apache.spark.util.ShutdownHookManagerWrapper$.$anonfun$addLogPusherHook$1(ShutdownHookManagerWrapper.scala:10) ~[AWSGlueSparkResourceManager-1.0.jar:3.3.0-amzn-1]
+	at org.apache.spark.util.SparkShutdownHook.run(ShutdownHookManager.scala:214) ~[spark-core_2.12-3.3.0-amzn-1.jar:3.3.0-amzn-1]
+	at org.apache.spark.util.SparkShutdownHookManager.$anonfun$runAll$2(ShutdownHookManager.scala:188) ~[spark-core_2.12-3.3.0-amzn-1.jar:3.3.0-amzn-1]
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23) ~[scala-library-2.12.15.jar:?]
+	at org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:2086) ~[spark-core_2.12-3.3.0-amzn-1.jar:3.3.0-amzn-1]
+	at org.apache.spark.util.SparkShutdownHookManager.$anonfun$runAll$1(ShutdownHookManager.scala:188) ~[spark-core_2.12-3.3.0-amzn-1.jar:3.3.0-amzn-1]
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23) ~[scala-library-2.12.15.jar:?]
+	at scala.util.Try$.apply(Try.scala:213) ~[scala-library-2.12.15.jar:?]
+	at org.apache.spark.util.SparkShutdownHookManager.runAll(ShutdownHookManager.scala:188) ~[spark-core_2.12-3.3.0-amzn-1.jar:3.3.0-amzn-1]
+	at org.apache.spark.util.SparkShutdownHookManager$$anon$2.run(ShutdownHookManager.scala:178) ~[spark-core_2.12-3.3.0-amzn-1.jar:3.3.0-amzn-1]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511) ~[?:1.8.0_472]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) ~[?:1.8.0_472]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149) ~[?:1.8.0_472]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624) ~[?:1.8.0_472]
+	at java.lang.Thread.run(Thread.java:750) ~[?:1.8.0_472]
+Caused by: com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.services.s3.model.AmazonS3Exception: The specified bucket does not exist (Service: Amazon S3; Status Code: 404; Error Code: NoSuchBucket; Request ID: EGC24XD9MH609GPE; S3 Extended Request ID: roPc8HDwsRmLUhU7XkKQc1e0a0Bq/5VMz+1pifRNVqUyNwAayDmuVA4tm1GMVAQ7kYQP6WBzkHU=; Proxy: null)
+	at com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.http.AmazonHttpClient$RequestExecutor.handleErrorResponse(AmazonHttpClient.java:1879) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.http.AmazonHttpClient$RequestExecutor.handleServiceErrorResponse(AmazonHttpClient.java:1418) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.http.AmazonHttpClient$RequestExecutor.executeOneRequest(AmazonHttpClient.java:1387) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.http.AmazonHttpClient$RequestExecutor.executeHelper(AmazonHttpClient.java:1157) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.http.AmazonHttpClient$RequestExecutor.doExecute(AmazonHttpClient.java:814) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.http.AmazonHttpClient$RequestExecutor.executeWithTimer(AmazonHttpClient.java:781) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.http.AmazonHttpClient$RequestExecutor.execute(AmazonHttpClient.java:755) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.http.AmazonHttpClient$RequestExecutor.access$500(AmazonHttpClient.java:715) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.http.AmazonHttpClient$RequestExecutionBuilderImpl.execute(AmazonHttpClient.java:697) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:561) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:541) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.services.s3.AmazonS3Client.invoke(AmazonS3Client.java:5516) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.services.s3.AmazonS3Client.invoke(AmazonS3Client.java:5463) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.services.s3.AmazonS3Client.listObjectsV2(AmazonS3Client.java:998) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.s3.lite.call.ListObjectsV2Call.perform(ListObjectsV2Call.java:26) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.s3.lite.call.ListObjectsV2Call.perform(ListObjectsV2Call.java:12) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.s3.lite.executor.GlobalS3Executor$CallPerformer.call(GlobalS3Executor.java:114) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.s3.lite.executor.GlobalS3Executor.execute(GlobalS3Executor.java:141) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.s3.lite.AmazonS3LiteClient.invoke(AmazonS3LiteClient.java:196) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.s3.lite.AmazonS3LiteClient.invoke(AmazonS3LiteClient.java:191) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.s3.lite.AmazonS3LiteClient.listObjectsV2(AmazonS3LiteClient.java:75) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	at com.amazon.ws.emr.hadoop.fs.s3n.Jets3tNativeFileSystemStore.list(Jets3tNativeFileSystemStore.java:414) ~[emrfs-hadoop-assembly-2.57.0.jar:?]
+	... 29 more
+2026-01-28 07:53:25,504 INFO [shutdown-hook-0] util.ShutdownHookManager (Logging.scala:logInfo(61)): Shutdown hook called
+2026-01-28 07:53:25,505 INFO [shutdown-hook-0] util.ShutdownHookManager (Logging.scala:logInfo(61)): Deleting directory /tmp/spark-db359605-361a-42dd-84d8-9592685b3416
+2026-01-28 07:53:25,510 INFO [shutdown-hook-0] util.ShutdownHookManager (Logging.scala:logInfo(61)): Deleting directory /tmp/spark-db359605-361a-42dd-84d8-9592685b3416/pyspark-834b5b20-b457-493c-bd8a-3050e8f16d9c
