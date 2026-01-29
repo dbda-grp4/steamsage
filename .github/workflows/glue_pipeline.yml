@@ -1,0 +1,40 @@
+name: Steam Glue Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Configure AWS
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Upload Glue scripts
+      run: |
+        aws s3 sync glue-scripts/ s3://steam-glue-roshani-2026/glue-scripts/
+
+    - name: Terraform Init
+      run: terraform init
+      working-directory: infra
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
+      working-directory: infra
+
+    - name: Run Glue jobs (ordered)
+      run: |
+        aws glue start-job-run --job-name steam-applications-etl
+        aws glue start-job-run --job-name steam-reviews-etl
+        aws glue start-job-run --job-name steam-dimensions-etl
+        aws glue start-job-run --job-name steam-masterdata-etl
