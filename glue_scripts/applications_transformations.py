@@ -111,3 +111,4 @@ bi_applications_capped_df.coalesce(1) \
     .write.mode("overwrite") \
     .option("header", "true") \
     .csv(bi_capped_csv)
+###########################################htyujujtjmiujmium
