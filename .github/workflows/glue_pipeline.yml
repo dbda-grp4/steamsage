@@ -1,83 +1,64 @@
-name: Steam Glue Pipeline (Safe CI/CD)
+name: Steam CI + CD + Automated ETL Pipeline
 
 on:
   push:
     branches:
-      - Roshani
-    paths:
-      - glue_scripts/**
-      - infra/**
-  workflow_dispatch:
-  
+      - main
+
 jobs:
-  deploy-and-run:
-    name: Deploy Infra, Upload Scripts, Trigger Glue Workflow
+  steam-pipeline:
     runs-on: ubuntu-latest
 
     steps:
-      # --------------------------------------------------
-      # 1️⃣ Checkout repository
-      # --------------------------------------------------
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    # 1️⃣ Checkout repository
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      # --------------------------------------------------
-      # 2️⃣ Configure AWS credentials
-      # --------------------------------------------------
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+    # 2️⃣ Configure AWS credentials
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
 
-      # --------------------------------------------------
-      # 3️⃣ Setup Terraform (explicit & safe)
-      # --------------------------------------------------
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.6.6
+    # 3️⃣ Upload Glue scripts to S3 (CI step)
+    - name: Upload Glue scripts to S3
+      run: |
+        aws s3 sync glue_scripts/ s3://steam-glue-roshani-2026/glue-scripts/
 
-      # --------------------------------------------------
-      # 4️⃣ Upload Glue scripts (CI responsibility)
-      # --------------------------------------------------
-      - name: Upload Glue scripts to S3
-        run: |
-          aws s3 sync glue_scripts/ s3://steam-glue-roshani-2026/glue-scripts/ --delete
+    # 4️⃣ Terraform Init
+    - name: Terraform Init
+      working-directory: infra
+      run: terraform init
 
-      # --------------------------------------------------
-      # 5️⃣ Terraform Init (idempotent)
-      # --------------------------------------------------
-      - name: Terraform Init
-        working-directory: infra
-        run: terraform init -input=false
+    # 5️⃣ Terraform Apply (infra + glue jobs)
+    - name: Terraform Apply
+      working-directory: infra
+      run: terraform apply -auto-approve
 
-      # --------------------------------------------------
-      # 6️⃣ Terraform Validate (early failure protection)
-      # --------------------------------------------------
-      - name: Terraform Validate
-        working-directory: infra
-        run: terraform validate
+    # =========================
+    # ETL JOBS (SEQUENTIAL RUN)
+    # =========================
 
-      # --------------------------------------------------
-      # 7️⃣ Terraform Plan (read-only safety check)
-      # --------------------------------------------------
-      - name: Terraform Plan
-        working-directory: infra
-        run: terraform plan -input=false -out=tfplan
+    - name: Run Applications ETL
+      run: aws glue start-job-run --job-name steam-applications-etl
 
-      # --------------------------------------------------
-      # 8️⃣ Terraform Apply (only planned changes)
-      # --------------------------------------------------
-      - name: Terraform Apply
-        working-directory: infra
-        run: terraform apply -input=false -auto-approve tfplan
+    - name: Run Reviews ETL
+      run: aws glue start-job-run --job-name steam-reviews-etl
 
-      # --------------------------------------------------
-      # 9️⃣ Trigger Glue Workflow (single execution entry)
-      # --------------------------------------------------
-      - name: Start Glue ETL Workflow
-        run: |
-          aws glue start-workflow-run \
-            --name steam-etl-workflow
+    - name: Run Dimensions ETL
+      run: aws glue start-job-run --job-name steam-dimensions-etl
+
+    - name: Run Masterdata ETL
+      run: aws glue start-job-run --job-name steam-masterdata-etl
+
+    # =========================
+    # CRAWLERS (SCHEMA UPDATE)
+    # =========================
+
+    - name: Run Curated Crawler
+      run: aws glue start-crawler --name steam-curated-crawler
+
+    - name: Run Gold Crawler
+      run: aws glue start-crawler --name steam-gold-crawler
