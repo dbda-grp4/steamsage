@@ -3,7 +3,7 @@
 ########################################
 resource "aws_glue_job" "applications" {
   name     = "tf-steam-applications-etl"
-  role_arn = aws_iam_role.glue.arn
+  role_arn = aws_iam_role.glue_service_role.arn
 
   command {
     name            = "glueetl"
@@ -11,10 +11,10 @@ resource "aws_glue_job" "applications" {
     python_version  = "3"
   }
 
-  glue_version       = "4.0"
-  worker_type        = "G.1X"
-  number_of_workers  = 2
-  timeout            = 60
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 2
+  timeout           = 60
 }
 
 ########################################
@@ -22,7 +22,7 @@ resource "aws_glue_job" "applications" {
 ########################################
 resource "aws_glue_job" "reviews" {
   name     = "tf-steam-reviews-etl"
-  role_arn = aws_iam_role.glue.arn
+  role_arn = aws_iam_role.glue_service_role.arn
 
   command {
     name            = "glueetl"
@@ -30,18 +30,18 @@ resource "aws_glue_job" "reviews" {
     python_version  = "3"
   }
 
-  glue_version       = "4.0"
-  worker_type        = "G.1X"
-  number_of_workers  = 2
-  timeout            = 60
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 2
+  timeout           = 60
 }
 
 ########################################
-# DIMENSIONS (JOIN BRIDGES) ETL JOB
+# DIMENSIONS ETL JOB
 ########################################
 resource "aws_glue_job" "dimensions" {
   name     = "tf-steam-dimensions-etl"
-  role_arn = aws_iam_role.glue.arn
+  role_arn = aws_iam_role.glue_service_role.arn
 
   command {
     name            = "glueetl"
@@ -49,10 +49,10 @@ resource "aws_glue_job" "dimensions" {
     python_version  = "3"
   }
 
-  glue_version       = "4.0"
-  worker_type        = "G.1X"
-  number_of_workers  = 2
-  timeout            = 60
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 2
+  timeout           = 60
 }
 
 ########################################
@@ -60,7 +60,7 @@ resource "aws_glue_job" "dimensions" {
 ########################################
 resource "aws_glue_job" "masterdata" {
   name     = "tf-steam-masterdata-etl"
-  role_arn = aws_iam_role.glue.arn
+  role_arn = aws_iam_role.glue_service_role.arn
 
   command {
     name            = "glueetl"
@@ -68,8 +68,8 @@ resource "aws_glue_job" "masterdata" {
     python_version  = "3"
   }
 
-  glue_version       = "4.0"
-  worker_type        = "G.1X"
-  number_of_workers  = 2
-  timeout            = 60
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 2
+  timeout           = 60
 }
