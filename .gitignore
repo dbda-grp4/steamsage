@@ -2,3 +2,8 @@
 .env/
 .venv/
 .pbix
+
+# Large / generated files
+5. Visualization/Dashboard.pbix
+6. Sentimenter/sentiment_model_local/
+
