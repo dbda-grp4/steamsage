@@ -8,7 +8,7 @@ on:
       - glue_scripts/**
       - infra/**
   workflow_dispatch:
-
+  
 jobs:
   deploy-and-run:
     name: Deploy Infra, Upload Scripts, Trigger Glue Workflow
