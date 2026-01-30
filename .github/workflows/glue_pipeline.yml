@@ -1,4 +1,4 @@
-name: Steam Glue Pipeline (CI + CD + Auto Run)
+name: Steam Glue Pipeline (CI + CD + Sequential ETL)
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1️⃣ Checkout code
+    # 1️⃣ Checkout repository
     - name: Checkout repository
       uses: actions/checkout@v3
 
@@ -22,7 +22,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    # 3️⃣ Upload Glue scripts (CI)
+    # 3️⃣ Upload Glue scripts to S3 (CI)
     - name: Upload Glue scripts to S3
       run: |
         aws s3 sync glue_scripts/ s3://steam-glue-roshani-2026/glue-scripts/
@@ -32,12 +32,12 @@ jobs:
       working-directory: infra
       run: terraform init
 
-    # 5️⃣ Terraform Apply (Infra + Jobs + Workflow)
+    # 5️⃣ Terraform Apply (Infra + Glue Jobs + Workflow)
     - name: Terraform Apply
       working-directory: infra
       run: terraform apply -auto-approve
 
-    # 6️⃣ Run Applications ETL
+    # 6️⃣ Run Applications ETL (Sequential)
     - name: Run Applications ETL
       run: |
         aws glue start-job-run --job-name tf-steam-applications-etl
