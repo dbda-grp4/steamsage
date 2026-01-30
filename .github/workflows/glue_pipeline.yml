@@ -1,4 +1,4 @@
-name: Steam Glue Pipeline (Full Automation)
+name: Steam Glue Pipeline (CI + CD + Auto Run)
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  deploy-and-run:
+  full-pipeline:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,28 +22,42 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    # 3️⃣ Upload Glue scripts to S3
-    - name: Upload Glue scripts
+    # 3️⃣ Upload Glue scripts (CI)
+    - name: Upload Glue scripts to S3
       run: |
-        aws s3 sync glue-scripts/ s3://steam-glue-roshani-2026/glue-scripts/
+        aws s3 sync glue_scripts/ s3://steam-glue-roshani-2026/glue-scripts/
 
     # 4️⃣ Terraform Init
     - name: Terraform Init
       working-directory: infra
       run: terraform init
 
-    # 5️⃣ Terraform Apply (infra, jobs, workflow, alarms)
+    # 5️⃣ Terraform Apply (Infra + Jobs + Workflow)
     - name: Terraform Apply
       working-directory: infra
       run: terraform apply -auto-approve
 
-    # 6️⃣ Trigger Glue Workflow (FULL ETL)
-    - name: Trigger Glue Workflow
+    # 6️⃣ Run Applications ETL
+    - name: Run Applications ETL
       run: |
-        aws glue start-workflow-run \
-          --name steam-etl-workflow
+        aws glue start-job-run --job-name tf-steam-applications-etl
 
-    # 7️⃣ Run Glue Crawlers (Athena automation)
+    # 7️⃣ Run Reviews ETL
+    - name: Run Reviews ETL
+      run: |
+        aws glue start-job-run --job-name tf-steam-reviews-etl
+
+    # 8️⃣ Run Dimensions ETL
+    - name: Run Dimensions ETL
+      run: |
+        aws glue start-job-run --job-name tf-steam-dimensions-etl
+
+    # 9️⃣ Run Masterdata ETL
+    - name: Run Masterdata ETL
+      run: |
+        aws glue start-job-run --job-name tf-steam-masterdata-etl
+
+    # 🔟 Run Crawlers (Athena Automation)
     - name: Run Glue Crawlers
       run: |
         aws glue start-crawler --name steam-curated-crawler
