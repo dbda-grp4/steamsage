@@ -1,64 +1,25 @@
-resource "aws_glue_workflow" "steam_pipeline" {
-  name = "steam-etl-workflow"
-}
+resource "aws_glue_crawler" "steam_crawler" {
+  name          = "steam-curated-crawler"
+  role          = aws_iam_role.glue_service_role.arn
+  database_name = "steam_analytics"
 
-resource "aws_glue_trigger" "applications_trigger" {
-  name          = "applications-trigger"
-  type          = "ON_DEMAND"
-  workflow_name = aws_glue_workflow.steam_pipeline.name
-
-  actions {
-    job_name = aws_glue_job.applications.name
+  s3_target {
+    path = "s3://steam-glue-roshani-2026/curated/"
   }
 }
-
-resource "aws_glue_trigger" "reviews_trigger" {
-  name          = "reviews-trigger"
+resource "aws_glue_trigger" "crawler_trigger" {
+  name          = "crawler-trigger"
   type          = "CONDITIONAL"
   workflow_name = aws_glue_workflow.steam_pipeline.name
 
   predicate {
     conditions {
-      job_name = aws_glue_job.applications.name
+      job_name = aws_glue_job.masterdata.name
       state    = "SUCCEEDED"
     }
   }
 
   actions {
-    job_name = aws_glue_job.reviews.name
-  }
-}
-
-resource "aws_glue_trigger" "dimensions_trigger" {
-  name          = "dimensions-trigger"
-  type          = "CONDITIONAL"
-  workflow_name = aws_glue_workflow.steam_pipeline.name
-
-  predicate {
-    conditions {
-      job_name = aws_glue_job.reviews.name
-      state    = "SUCCEEDED"
-    }
-  }
-
-  actions {
-    job_name = aws_glue_job.dimensions.name
-  }
-}
-
-resource "aws_glue_trigger" "masterdata_trigger" {
-  name          = "masterdata-trigger"
-  type          = "CONDITIONAL"
-  workflow_name = aws_glue_workflow.steam_pipeline.name
-
-  predicate {
-    conditions {
-      job_name = aws_glue_job.dimensions.name
-      state    = "SUCCEEDED"
-    }
-  }
-
-  actions {
-    job_name = aws_glue_job.masterdata.name
+    crawler_name = aws_glue_crawler.steam_crawler.name
   }
 }
