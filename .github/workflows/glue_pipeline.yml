@@ -1,15 +1,14 @@
-name: Steam Glue Pipeline (CI + CD + Orchestration)
+name: Steam Glue Pipeline (Safe CI/CD)
 
 on:
   push:
     branches:
-      - Roshani
-
+      - main        # change to your feature branch if needed
   workflow_dispatch:
 
 jobs:
   deploy-and-run:
-    name: Deploy Infra, Upload Scripts, Run Glue Workflow
+    name: Deploy Infra, Upload Scripts, Trigger Glue Workflow
     runs-on: ubuntu-latest
 
     steps:
@@ -30,36 +29,52 @@ jobs:
           aws-region: us-east-1
 
       # --------------------------------------------------
-      # 3️⃣ Setup Terraform
+      # 3️⃣ Setup Terraform (explicit & safe)
       # --------------------------------------------------
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
 
       # --------------------------------------------------
-      # 4️⃣ Upload Glue scripts to S3 (CI)
+      # 4️⃣ Upload Glue scripts (CI responsibility)
       # --------------------------------------------------
       - name: Upload Glue scripts to S3
         run: |
-          aws s3 sync glue_scripts/ s3://steam-glue-roshani-2026/glue-scripts/
+          aws s3 sync glue_scripts/ s3://steam-glue-roshani-2026/glue-scripts/ --delete
 
       # --------------------------------------------------
-      # 5️⃣ Terraform Init
+      # 5️⃣ Terraform Init (idempotent)
       # --------------------------------------------------
       - name: Terraform Init
         working-directory: infra
-        run: terraform init
+        run: terraform init -input=false
 
       # --------------------------------------------------
-      # 6️⃣ Terraform Apply (Infra as Code)
+      # 6️⃣ Terraform Validate (early failure protection)
+      # --------------------------------------------------
+      - name: Terraform Validate
+        working-directory: infra
+        run: terraform validate
+
+      # --------------------------------------------------
+      # 7️⃣ Terraform Plan (read-only safety check)
+      # --------------------------------------------------
+      - name: Terraform Plan
+        working-directory: infra
+        run: terraform plan -input=false -out=tfplan
+
+      # --------------------------------------------------
+      # 8️⃣ Terraform Apply (only planned changes)
       # --------------------------------------------------
       - name: Terraform Apply
         working-directory: infra
-        run: terraform apply -auto-approve
+        run: terraform apply -input=false -auto-approve tfplan
 
       # --------------------------------------------------
-      # 7️⃣ Start Glue Workflow (Single Orchestration Trigger)
+      # 9️⃣ Trigger Glue Workflow (single execution entry)
       # --------------------------------------------------
       - name: Start Glue ETL Workflow
         run: |
           aws glue start-workflow-run \
-            --name tf-steam-etl-workflow
+            --name steam-etl-workflow
