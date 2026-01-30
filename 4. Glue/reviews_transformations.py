@@ -6,6 +6,7 @@ from pyspark.sql import SparkSession
 sc = SparkContext.getOrCreate()
 spark = SparkSession.builder.getOrCreate()
 
+review_score_path = "s3://steam-dataset-2025-bucket/silver/reviews/reviews_scored_final.csv"
 
 
 RAW_BASE = "s3://steam-dataset-2025-bucket/Steam/steam_dataset_2025_csv_package_v1/steam_dataset_2025_csv"
@@ -53,7 +54,12 @@ bi_reviews_df = reviews_df.select(
     "timestamp_created"
 )
 
-
+review_score_df = (
+    spark.read
+    .option("header", "true")
+    .option("inferSchema", "true")
+    .csv(review_score_path)
+)
 
 bi_reviews_df.select(
     countDistinct("recommendationid").alias("distinct_reviews"),
@@ -97,16 +103,27 @@ bi_reviews_capped_df = (
     )
 )
 
+bi_reviews_enriched_df = (
+    bi_reviews_capped_df
+    .join(
+        review_score_df,
+        on="recommendationid",
+        how="left"
+    )
+)
 
 
 review_fact_df = (
-    bi_reviews_capped_df
+    bi_reviews_enriched_df   # ✅ USE JOINED DF
     .withColumn("review_timestamp", from_unixtime(col("timestamp_created")))
     .withColumn("review_date", to_date(col("review_timestamp")))
     .withColumn("review_year", year(col("review_timestamp")))
     .withColumn("review_month", month(col("review_timestamp")))
     .withColumn("review_year_month", date_format(col("review_timestamp"), "yyyy-MM"))
 )
+
+
+
 
 review_fact_df.write.mode("overwrite").parquet(review_out_parquet)
 
