@@ -3,7 +3,10 @@ name: Steam Glue Pipeline (Safe CI/CD)
 on:
   push:
     branches:
-      - Roshani        # change to your feature branch if needed
+      - Roshani
+    paths:
+      - glue_scripts/**
+      - infra/**
   workflow_dispatch:
 
 jobs:
