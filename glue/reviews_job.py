@@ -14,26 +14,18 @@ from pyspark.sql.functions import (
 from awsglue.context import GlueContext
 from awsglue.utils import getResolvedOptions
 
-
 # --------------------------------------------------
 # Glue job arguments
 # --------------------------------------------------
-args = getResolvedOptions(
-    sys.argv,
-    [
-        'JOB_NAME',
-        'RAW_BASE',
-        'SILVER_BASE'
-    ]
-)
+args = getResolvedOptions(sys.argv, ['JOB_NAME'])
 
-RAW_BASE = args['RAW_BASE']
-SILVER_BASE = args['SILVER_BASE']
+BUCKET = "steam-analytics-steam-analytics-aman-2026"
+RAW_BASE = f"s3://{BUCKET}/raw"
+SILVER_BASE = f"s3://{BUCKET}/silver"
 
 print(f"Starting Glue job: {args['JOB_NAME']}")
 print(f"RAW_BASE: {RAW_BASE}")
 print(f"SILVER_BASE: {SILVER_BASE}")
-
 
 # --------------------------------------------------
 # Glue Context
@@ -42,14 +34,15 @@ sc = SparkContext.getOrCreate()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 
-
 # --------------------------------------------------
 # Input / Output paths
 # --------------------------------------------------
 reviews_input = f"{RAW_BASE}/reviews.csv"
 
-review_out_parquet = f"{SILVER_BASE}/fact_review_level/parquet/"
+# 🔑 ADDITION: review score CSV (REQUIRED TRANSFORMATION)
+review_score_input = f"{SILVER_BASE}/reviews/reviews_scored_final.csv"
 
+review_out_parquet = f"{SILVER_BASE}/reviews/bi_reviews_capped/parquet/"
 
 # --------------------------------------------------
 # Read RAW reviews CSV
@@ -59,7 +52,7 @@ reviews_df = (
     .format("csv")
     .option("header", "true")
     .option("inferSchema", "true")
-    .option("multiLine", "true")    # IMPORTANT
+    .option("multiLine", "true")
     .option("quote", "\"")
     .option("escape", "\"")
     .option("mode", "PERMISSIVE")
@@ -67,6 +60,16 @@ reviews_df = (
     .load(reviews_input)
 )
 
+# --------------------------------------------------
+# Read review score CSV (MAIN ADDITION)
+# --------------------------------------------------
+review_scores_df = (
+    spark.read
+    .format("csv")
+    .option("header", "true")
+    .option("inferSchema", "true")
+    .load(review_score_input)
+)
 
 # --------------------------------------------------
 # Select BI-relevant columns
@@ -74,26 +77,30 @@ reviews_df = (
 bi_reviews_df = reviews_df.select(
     "recommendationid",
     "appid",
-
     "votes_up",
     "votes_funny",
     "comment_count",
     "weighted_vote_score",
-
     "author_playtime_at_review",
     "author_playtime_forever",
     "author_playtime_last_two_weeks",
     "author_num_games_owned",
     "author_num_reviews",
-
     "steam_purchase",
     "received_for_free",
     "written_during_early_access",
-
     "language",
     "timestamp_created"
 )
 
+# --------------------------------------------------
+# JOIN with review scores (ONLY LOGIC ADDITION)
+# --------------------------------------------------
+bi_reviews_df = bi_reviews_df.join(
+    review_scores_df,
+    on="recommendationid",
+    how="inner"
+)
 
 # --------------------------------------------------
 # Data integrity check
@@ -103,9 +110,8 @@ bi_reviews_df.select(
     count("*").alias("total_rows")
 ).show()
 
-
 # --------------------------------------------------
-# Apply capping (pre-computed thresholds)
+# Apply capping (UNCHANGED)
 # --------------------------------------------------
 bi_reviews_capped_df = (
     bi_reviews_df
@@ -141,9 +147,8 @@ bi_reviews_capped_df = (
     )
 )
 
-
 # --------------------------------------------------
-# Time enrichment
+# Time enrichment (UNCHANGED)
 # --------------------------------------------------
 review_fact_df = (
     bi_reviews_capped_df
@@ -151,12 +156,14 @@ review_fact_df = (
     .withColumn("review_date", to_date(col("review_timestamp")))
     .withColumn("review_year", year(col("review_timestamp")))
     .withColumn("review_month", month(col("review_timestamp")))
-    .withColumn("review_year_month", date_format(col("review_timestamp"), "yyyy-MM"))
+    .withColumn(
+        "review_year_month",
+        date_format(col("review_timestamp"), "yyyy-MM")
+    )
 )
 
-
 # --------------------------------------------------
-# Write SILVER output (Parquet only)
+# Write SILVER output (Parquet)
 # --------------------------------------------------
 review_fact_df.write.mode("overwrite").parquet(review_out_parquet)
 
