@@ -125,3 +125,27 @@ resource "aws_glue_job" "master_job" {
     Environment = var.environment
   }
 }
+
+# -----------------------------
+# Glue Crawler (Gold Layer)
+# -----------------------------
+resource "aws_glue_crawler" "gold_crawler" {
+  name          = "${var.project_name}-gold-crawler-${var.environment}"
+  database_name = aws_athena_database.steam_db.name
+  role          = aws_iam_role.glue_role.arn
+
+  s3_target {
+    path = "s3://${aws_s3_bucket.data_lake.bucket}/gold/"
+  }
+
+  # Automatically add new columns if schema evolves, but only log deletions
+  schema_change_policy {
+    delete_behavior = "LOG"
+    update_behavior = "UPDATE_IN_DATABASE"
+  }
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+  }
+}
