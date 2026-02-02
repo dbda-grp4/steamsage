@@ -1,0 +1,156 @@
+name: Steam Glue ETL Pipeline (Parallel + Wait + Crawler)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  # --------------------------------------------------
+  # 1️⃣ Upload Glue Scripts
+  # --------------------------------------------------
+  upload-scripts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Upload Glue scripts to S3
+        run: |
+          aws s3 cp glue_scripts/applications_transformations.py s3://steam-glue-roshani-2026/glue_scripts/applications_transformations.py
+          aws s3 cp glue_scripts/reviews_transformations.py s3://steam-glue-roshani-2026/glue_scripts/reviews_transformations.py
+          aws s3 cp glue_scripts/join_bridges.py s3://steam-glue-roshani-2026/glue_scripts/join_bridges.py
+          aws s3 cp glue_scripts/masterdata.py s3://steam-glue-roshani-2026/glue_scripts/masterdata.py
+
+  # --------------------------------------------------
+  # 2️⃣ Run Glue Jobs in Parallel
+  # --------------------------------------------------
+  applications-etl:
+    runs-on: ubuntu-latest
+    needs: upload-scripts
+    outputs:
+      run_id: ${{ steps.start.outputs.run_id }}
+
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - id: start
+        run: |
+          RUN_ID=$(aws glue start-job-run --job-name applications_transformations --query JobRunId --output text)
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+
+  reviews-etl:
+    runs-on: ubuntu-latest
+    needs: upload-scripts
+    outputs:
+      run_id: ${{ steps.start.outputs.run_id }}
+
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - id: start
+        run: |
+          RUN_ID=$(aws glue start-job-run --job-name reviews_transformations --query JobRunId --output text)
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+
+  join-bridges-etl:
+    runs-on: ubuntu-latest
+    needs: upload-scripts
+    outputs:
+      run_id: ${{ steps.start.outputs.run_id }}
+
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - id: start
+        run: |
+          RUN_ID=$(aws glue start-job-run --job-name join_bridges --query JobRunId --output text)
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+
+  # --------------------------------------------------
+  # 3️⃣ Wait for ALL Glue Jobs to Succeed
+  # --------------------------------------------------
+  wait-for-etl:
+    runs-on: ubuntu-latest
+    needs:
+      - applications-etl
+      - reviews-etl
+      - join-bridges-etl
+
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Wait for Glue jobs to complete
+        run: |
+          JOBS=(
+            "applications_transformations:${{ needs.applications-etl.outputs.run_id }}"
+            "reviews_transformations:${{ needs.reviews-etl.outputs.run_id }}"
+            "join_bridges:${{ needs.join-bridges-etl.outputs.run_id }}"
+          )
+
+          for JOB in "${JOBS[@]}"; do
+            JOB_NAME=$(echo $JOB | cut -d: -f1)
+            RUN_ID=$(echo $JOB | cut -d: -f2)
+
+            echo "Waiting for $JOB_NAME ($RUN_ID)..."
+
+            while true; do
+              STATUS=$(aws glue get-job-run \
+                --job-name $JOB_NAME \
+                --run-id $RUN_ID \
+                --query JobRun.JobRunState \
+                --output text)
+
+              if [[ "$STATUS" == "SUCCEEDED" ]]; then
+                echo "$JOB_NAME completed successfully."
+                break
+              elif [[ "$STATUS" == "FAILED" || "$STATUS" == "STOPPED" || "$STATUS" == "TIMEOUT" ]]; then
+                echo "$JOB_NAME failed with status $STATUS"
+                exit 1
+              else
+                sleep 30
+              fi
+            done
+          done
+
+  # --------------------------------------------------
+  # 4️⃣ Run Glue Crawler (ONLY after ETL success)
+  # --------------------------------------------------
+  run-crawler:
+    runs-on: ubuntu-latest
+    needs: wait-for-etl
+
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Run Glue Crawler
+        run: |
+          aws glue start-crawler --name steam-curated-crawler
