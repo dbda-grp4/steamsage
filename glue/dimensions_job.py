@@ -160,4 +160,4 @@ app_platforms_rows_df.write.mode("overwrite").parquet(out_platforms)
 
 print("Dimensions job completed successfully.")
 
-# run it 
+#fbdfdbrere
