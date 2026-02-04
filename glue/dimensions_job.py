@@ -1,7 +1,6 @@
 import sys
 from pyspark.context import SparkContext
-from pyspark.sql.functions import collect_set, concat_ws, col
-from pyspark.sql.functions import countDistinct, count
+from pyspark.sql.functions import collect_set, concat_ws, col, trim, countDistinct, count
 from awsglue.context import GlueContext
 from awsglue.utils import getResolvedOptions
 
