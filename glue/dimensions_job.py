@@ -56,7 +56,7 @@ platforms_path      = f"{RAW_BASE}/platforms.csv"
 # Output paths (SILVER)
 # --------------------------------------------------
 out_devs       = f"{SILVER_BASE}/dimensions/app_developers/"
-out_pubs = f"{SILVER_BASE}/dimensions/app_publishers/"
+out_publishers = f"{SILVER_BASE}/dimensions/app_publishers/"
 out_genres     = f"{SILVER_BASE}/dimensions/app_genres/"
 out_categories = f"{SILVER_BASE}/dimensions/app_categories/"
 out_platforms  = f"{SILVER_BASE}/dimensions/app_platforms/"
@@ -159,5 +159,3 @@ app_categories_rows_df.write.mode("overwrite").parquet(out_categories)
 app_platforms_rows_df.write.mode("overwrite").parquet(out_platforms)
 
 print("Dimensions job completed successfully.")
-
-#fbdfdbrere
