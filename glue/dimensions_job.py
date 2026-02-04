@@ -39,7 +39,7 @@ spark = glueContext.spark_session
 app_devs_path       = f"{RAW_BASE}/application_developers.csv"
 developers_path     = f"{RAW_BASE}/developers.csv"
 
-app_pubs_path = f"{RAW_BASE}/application_publishers.csv"
+app_ppublishers_path = f"{RAW_BASE}/application_publishers.csv"
 publishers_path     = f"{RAW_BASE}/publishers.csv"
 
 app_genres_path     = f"{RAW_BASE}/application_genres.csv"
@@ -67,7 +67,7 @@ out_platforms  = f"{SILVER_BASE}/dimensions/app_platforms/"
 app_devs_df = spark.read.option("header", "true").csv(app_devs_path)
 developers_df = spark.read.option("header", "true").csv(developers_path)
 
-app_publishers_df = spark.read.option("header", "true").csv(app_publishers_path)
+app_pubs_df = spark.read.option("header", "true").csv(app_publishers_path)
 publishers_df = spark.read.option("header", "true").csv(publishers_path)
 
 app_genres_df = spark.read.option("header", "true").csv(app_genres_path)
@@ -159,4 +159,5 @@ app_categories_rows_df.write.mode("overwrite").parquet(out_categories)
 app_platforms_rows_df.write.mode("overwrite").parquet(out_platforms)
 
 print("Dimensions job completed successfully.")
+
 
