@@ -62,7 +62,6 @@ out_genres     = f"{SILVER_BASE}/dimensions/app_genres/"
 out_categories = f"{SILVER_BASE}/dimensions/app_categories/"
 out_platforms  = f"{SILVER_BASE}/dimensions/app_platforms/"
 
-
 # --------------------------------------------------
 # Read RAW CSVs
 # --------------------------------------------------
@@ -81,92 +80,83 @@ categories_df = spark.read.option("header", "true").csv(categories_path)
 app_platforms_df = spark.read.option("header", "true").csv(app_platforms_path)
 platforms_df = spark.read.option("header", "true").csv(platforms_path)
 
-
-# --------------------------------------------------
-# Aggregate dimensions (1 row per appid)
-# --------------------------------------------------
-app_developers_agg_df = (
+# ==================================================
+# DEVELOPERS (1 row per app per developer)
+# ==================================================
+app_developers_rows_df = (
     app_devs_df
-    .join(
-        developers_df,
-        app_devs_df.developer_id == developers_df.id,
-        how="left"
+    .join(developers_df, app_devs_df.developer_id == developers_df.id, "left")
+    .select(
+        app_devs_df.appid.cast("long").alias("appid"),
+        trim(col("name")).alias("developer")
     )
-    .groupBy(app_devs_df.appid)
-    .agg(
-        concat_ws(", ", collect_set(col("name"))).alias("developers")
-    )
+    .filter(col("developer").isNotNull())
+    .dropDuplicates()
 )
 
-app_publishers_agg_df = (
-    app_publishers_df
-    .join(
-        publishers_df,
-        app_publishers_df.publisher_id == publishers_df.id,
-        how="left"
+# ==================================================
+# PUBLISHERS
+# ==================================================
+app_publishers_rows_df = (
+    app_pubs_df
+    .join(publishers_df, app_pubs_df.publisher_id == publishers_df.id, "left")
+    .select(
+        app_pubs_df.appid.cast("long").alias("appid"),
+        trim(col("name")).alias("publisher")
     )
-    .groupBy(app_publishers_df.appid)
-    .agg(
-        concat_ws(", ", collect_set(col("name"))).alias("publishers")
-    )
+    .filter(col("publisher").isNotNull())
+    .dropDuplicates()
 )
 
-app_genres_agg_df = (
+# ==================================================
+# GENRES
+# ==================================================
+app_genres_rows_df = (
     app_genres_df
-    .join(
-        genres_df,
-        app_genres_df.genre_id == genres_df.id,
-        how="left"
+    .join(genres_df, app_genres_df.genre_id == genres_df.id, "left")
+    .select(
+        app_genres_df.appid.cast("long").alias("appid"),
+        trim(col("name")).alias("genre")
     )
-    .groupBy(app_genres_df.appid)
-    .agg(
-        concat_ws(", ", collect_set(col("name"))).alias("genres")
-    )
+    .filter(col("genre").isNotNull())
+    .dropDuplicates()
 )
 
-app_categories_agg_df = (
+# ==================================================
+# CATEGORIES
+# ==================================================
+app_categories_rows_df = (
     app_categories_df
-    .join(
-        categories_df,
-        app_categories_df.category_id == categories_df.id,
-        how="left"
+    .join(categories_df, app_categories_df.category_id == categories_df.id, "left")
+    .select(
+        app_categories_df.appid.cast("long").alias("appid"),
+        trim(col("name")).alias("category")
     )
-    .groupBy(app_categories_df.appid)
-    .agg(
-        concat_ws(", ", collect_set(col("name"))).alias("categories")
-    )
+    .filter(col("category").isNotNull())
+    .dropDuplicates()
 )
 
-app_platforms_agg_df = (
+# ==================================================
+# PLATFORMS
+# ==================================================
+app_platforms_rows_df = (
     app_platforms_df
-    .join(
-        platforms_df,
-        app_platforms_df.platform_id == platforms_df.id,
-        how="left"
+    .join(platforms_df, app_platforms_df.platform_id == platforms_df.id, "left")
+    .select(
+        app_platforms_df.appid.cast("long").alias("appid"),
+        trim(col("name")).alias("platform")
     )
-    .groupBy(app_platforms_df.appid)
-    .agg(
-        concat_ws(", ", collect_set(col("name"))).alias("platforms")
-    )
+    .filter(col("platform").isNotNull())
+    .dropDuplicates()
 )
-
-
-# --------------------------------------------------
-# Integrity check (example on developers)
-# --------------------------------------------------
-app_developers_agg_df.select(
-    countDistinct("appid").alias("distinct_appids"),
-    count("*").alias("rows")
-).show()
-
 
 # --------------------------------------------------
 # Write SILVER dimension outputs (Parquet only)
 # --------------------------------------------------
-app_developers_agg_df.write.mode("overwrite").parquet(out_devs)
-app_publishers_agg_df.write.mode("overwrite").parquet(out_publishers)
-app_genres_agg_df.write.mode("overwrite").parquet(out_genres)
-app_categories_agg_df.write.mode("overwrite").parquet(out_categories)
-app_platforms_agg_df.write.mode("overwrite").parquet(out_platforms)
+app_developers_rows_df.write.mode("overwrite").parquet(out_devs)
+app_publishers_rows_df.write.mode("overwrite").parquet(out_publishers)
+app_genres_rows_df.write.mode("overwrite").parquet(out_genres)
+app_categories_rows_df.write.mode("overwrite").parquet(out_categories)
+app_platforms_rows_df.write.mode("overwrite").parquet(out_platforms)
 
 print("Dimensions job completed successfully.")
