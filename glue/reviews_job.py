@@ -130,7 +130,7 @@ review_score_df = (
     spark.read
     .option("header", "true")
     .option("inferSchema", "true")
-    .csv(review_score_path)
+    .csv(review_score_input)
     .withColumnRenamed("category", "review_category") 
 )
 
