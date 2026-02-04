@@ -1,9 +1,6 @@
 import sys
 from pyspark.context import SparkContext
-from pyspark.sql.functions import (
-    col, when, from_unixtime, to_date, year, month, date_format,
-    countDistinct, count
-)
+from pyspark.sql.functions import (col, when, from_unixtime, to_date, year, month, date_format, countDistinct, count, trim)
 from awsglue.context import GlueContext
 from awsglue.utils import getResolvedOptions
 
@@ -44,16 +41,15 @@ spark = glueContext.spark_session
 # --------------------------------------------------
 reviews_input = f"{RAW_BASE}/reviews.csv"
 
-# ✅ FIX: Use SCORES_BASE (Old Bucket) to find the file
+# Use SCORES_BASE (Old Bucket) to find the file
 review_score_input = f"{SCORES_BASE}/reviews/reviews_scored_final.csv"
 
 # Output goes to SILVER_BASE (New Bucket)
 review_out_parquet = f"{SILVER_BASE}/reviews/bi_reviews_capped/parquet/"
 
-# --------------------------------------------------
-# Read RAW reviews CSV
-# --------------------------------------------------
-print(f"Reading Reviews from: {reviews_input}")
+# =============================================================================
+# Read RAW reviews
+# =============================================================================
 reviews_df = (
     spark.read
     .format("csv")
@@ -67,69 +63,113 @@ reviews_df = (
     .load(reviews_input)
 )
 
-# --------------------------------------------------
-# Read review score CSV
-# --------------------------------------------------
-print(f"Reading Scores from: {review_score_input}")
-review_scores_df = (
-    spark.read
-    .format("csv")
-    .option("header", "true")
-    .option("inferSchema", "true")
-    .load(review_score_input)
-)
-
-# --------------------------------------------------
-# Select BI-relevant columns
-# --------------------------------------------------
+# =============================================================================
+# Select required columns
+# =============================================================================
 bi_reviews_df = reviews_df.select(
-    "recommendationid", "appid", "votes_up", "votes_funny", "comment_count",
-    "weighted_vote_score", "author_playtime_at_review", "author_playtime_forever",
-    "author_playtime_last_two_weeks", "author_num_games_owned", "author_num_reviews",
-    "steam_purchase", "received_for_free", "written_during_early_access",
-    "language", "timestamp_created"
+    "recommendationid",
+    "appid",
+    "votes_up",
+    "votes_funny",
+    "weighted_vote_score",
+    "author_playtime_at_review",
+    "author_num_reviews",
+    "language",
+    "timestamp_created"
 )
 
-# --------------------------------------------------
-# JOIN with review scores
-# --------------------------------------------------
-bi_reviews_df = bi_reviews_df.join(
-    review_scores_df,
-    on="recommendationid",
-    how="inner"
-)
+# =============================================================================
+# Convert playtime (minutes → hours → capped)
+# =============================================================================
+PLAYTIME_HOURS_P95 = 67.6  #calculated in EDA
 
-# --------------------------------------------------
-# Data integrity check
-# --------------------------------------------------
-bi_reviews_df.select(
-    countDistinct("recommendationid").alias("distinct_reviews"),
-    count("*").alias("total_rows")
-).show()
-
-# --------------------------------------------------
-# Apply capping
-# --------------------------------------------------
-bi_reviews_capped_df = (
+bi_reviews_df = (
     bi_reviews_df
-    .withColumn("author_playtime_forever_capped", when(col("author_playtime_forever") > 26026, 26026).otherwise(col("author_playtime_forever")))
-    .withColumn("author_playtime_at_review_capped", when(col("author_playtime_at_review") > 22677, 22677).otherwise(col("author_playtime_at_review")))
-    .withColumn("author_playtime_last_two_weeks_capped", when(col("author_playtime_last_two_weeks") > 2673, 2673).otherwise(col("author_playtime_last_two_weeks")))
-    .withColumn("votes_up_capped", when(col("votes_up") > 49, 49).otherwise(col("votes_up")))
-    .withColumn("votes_funny_capped", when(col("votes_funny") > 10, 10).otherwise(col("votes_funny")))
-    .withColumn("comment_count_capped", when(col("comment_count") > 4, 4).otherwise(col("comment_count")))
+    .withColumn("author_playtime_at_review_hours", col("author_playtime_at_review") / 60.0)
+    .withColumn(
+        "author_playtime",
+        when(col("author_playtime_at_review_hours") > PLAYTIME_HOURS_P95, PLAYTIME_HOURS_P95)
+        .otherwise(col("author_playtime_at_review_hours"))
+    )
 )
 
-# --------------------------------------------------
-# Time enrichment
-# --------------------------------------------------
-review_fact_df = (
-    bi_reviews_capped_df
+# =============================================================================
+# Engagement metric
+# =============================================================================
+bi_reviews_df = bi_reviews_df.withColumn(
+    "review_reactions",
+    col("votes_up") + col("votes_funny")
+)
+
+# =============================================================================
+# Time dimensions
+# =============================================================================
+bi_reviews_df = (
+    bi_reviews_df
     .withColumn("review_timestamp", from_unixtime(col("timestamp_created")))
     .withColumn("review_date", to_date(col("review_timestamp")))
     .withColumn("review_year", year(col("review_timestamp")))
-    .withColumn("review_month", month(col("review_timestamp")))
-    .withColumn("review_year_month", date_format(col("review_timestamp"), "yyyy-MM"))
+)
+
+# =============================================================================
+# Drop intermediates
+# =============================================================================
+bi_reviews_df = bi_reviews_df.drop(
+    "votes_up",
+    "votes_funny",
+    "author_playtime_at_review",
+    "author_playtime_at_review_hours",
+    "timestamp_created",
+    "review_timestamp"
+)
+
+# =============================================================================
+# Read SENTIMENT FILE  
+# =============================================================================
+review_score_df = (
+    spark.read
+    .option("header", "true")
+    .option("inferSchema", "true")
+    .csv(review_score_path)
+    .withColumnRenamed("category", "review_category") 
+)
+
+# =============================================================================
+# Join sentiment data
+# =============================================================================
+review_fact_df = (
+    bi_reviews_df
+    .join(
+        review_score_df,
+        on="recommendationid",
+        how="left"
+    )
+)
+
+# =============================================================================
+# Clean blanks → NULL
+# =============================================================================
+for c in ["language", "review_category"]:
+    review_fact_df = review_fact_df.withColumn(
+        c,
+        when(trim(col(c)) == "", None).otherwise(col(c))
+    )
+
+# =============================================================================
+# Final projection (NO category reference anymore)
+# =============================================================================
+review_fact_df = review_fact_df.select(
+    "recommendationid",
+    "appid",
+    "review_date",
+    "review_year",
+    "review_reactions",
+    "weighted_vote_score",
+    "author_playtime",
+    "author_num_reviews",
+    "language",
+    "review_category",
+    "numeric_score"
 )
 
 # --------------------------------------------------
