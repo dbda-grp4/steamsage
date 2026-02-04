@@ -109,6 +109,18 @@ bi_applications_df = bi_applications_df.withColumn(
 )
 
 # --------------------------------------------------
+# Ensure numeric types for quantile computation
+# --------------------------------------------------
+bi_applications_df = (
+    bi_applications_df
+    .withColumn("mat_initial_price", col("mat_initial_price").cast("double"))
+    .withColumn("mat_final_price", col("mat_final_price").cast("double"))
+    .withColumn("recommendations_total", col("recommendations_total").cast("double"))
+    .withColumn("mat_achievement_count", col("mat_achievement_count").cast("double"))
+)
+
+
+# --------------------------------------------------
 # Compute p99 thresholds
 # --------------------------------------------------
 price_init_p99 = bi_applications_df.approxQuantile("mat_initial_price", [0.99], 0.01)[0]
