@@ -125,11 +125,12 @@ resource "aws_iam_role_policy" "glue_access_existing_data" {
           "kms:Decrypt",
           "kms:GenerateDataKey"
         ]
-        Resource = "*"  # Allows access to any key used by that bucket
+        Resource = "*"  
       }
     ]
   })
 }
+
 
 
 
