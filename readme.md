@@ -1,214 +1,144 @@
-# 🎮 Steam Dataset 2025: Multi-Modal Gaming Analytics  
-**Group 4 – Big Data Analytics Project**
+# 🎮 SteamSAGE – Steam: Semantic-Search and Analytics of Game Experiences
 
+> **SteamSAGE** is a big data analytics and semantic search platform built on data of Steam Platform. It combines advanced analytics, and NLP-powered semantic-search to understand *how games are priced, reviewed, and experienced by players*.
+
+![SteamSAGE Logo](diagrams/SteamSAGE_logo.png)
+---
+
+## 🚀 Motivation
+
+Steam hosts **hundreds of thousands of games** and **millions of player reviews**, but raw data alone does not answer critical questions:
+
+- Why do some games succeed while others fail?
+- How do pricing, genres, platforms, and developers influence player sentiment?
+- Can we search games *by meaning*, not just keywords?
+
+**SteamSAGE** was built to bridge this gap by unifying:
+
+- 🔍 **Semantic Search** over games and reviews
+- 📊 **Business & product analytics**
+- ⚙️ **Cloud-scale data engineering**
 
 ---
 
 ## ❓ Problem Statement
-Player engagement and review behavior on Steam are influenced by many factors, but the relationships between **game attributes**, **user sentiment**, and **market success** are not clearly understood.
 
-This lack of insight makes it difficult for developers and publishers to:
-- Identify drivers of positive sentiment
-- Improve game visibility and traction
-- Predict long-term success and community response
+Steam data is:
 
-This project aims to bridge that gap using **big data analytics and machine learning**.
+- Massive (millions of rows)
+- Highly relational (many-to-many relationships)
+- Semi-structured (JSON fields, text reviews)
+- Poorly suited for traditional analytics without heavy transformation
 
----
+As a result:
 
-## 📂 Dataset
-- **Dataset Name:** Steam Dataset 2025 – Multi-Modal Gaming Analytics  
-- **Source:** Kaggle  
-- **Link:**  
-  https://www.kaggle.com/datasets/crainbramp/steam-dataset-2025-multi-modal-gaming-analytics
+- Developers struggle to extract insights from reviews
+- Analysts lack a clean, analytics-ready schema
+- Keyword search fails to capture *intent* and *experience*
 
-### Dataset Characteristics
-- **239,664+ games**
-- **1,000,000+ user reviews**
-- **Multi-modal data**:
-  - Structured metadata (games, genres, publishers, platforms)
-  - Textual data (reviews, descriptions)
-  - Vector embeddings (semantic search & ML)
+👉 **SteamSAGE solves this by designing a clean analytical model, scalable pipelines, and semantic embeddings to unlock deeper insights.**
 
 ---
 
-## 🎯 Project Objectives
-1. Transform Steam data into actionable insights by analyzing reviews and metadata.
-2. Build a **scalable big-data pipeline** using cloud storage and Apache Spark.
-3. Perform **sentiment analysis** to identify positive/negative trends and common issues.
-4. Generate **business insights** on:
-   - Game success
-   - Developer & publisher performance
-   - Genre popularity
-   - Pricing strategies
-5. Create **interactive dashboards (Power BI)** for visualization and reporting.
-6. Develop **machine learning models** for:
-   - Sentiment classification  
-   - Success prediction  
-   - Trend forecasting
-7. Enable **automation and scalability** with scheduled ETL jobs and future enhancements.
+## 🧱 Raw Database Architecture
+
+The raw dataset closely mirrors the Steam API structure and contains deeply nested and normalized entities.
+![Raw Database Architecture](diagrams/raw_database_architecture.png)
+**Key characteristics:**
+
+- Raw CSV ingestion
+- Highly normalized
+- JSON-heavy fields (prices, requirements, ratings)
+- Not suitable for BI or ML directly
 
 ---
 
-## 🗂️ Data Dictionary (High-Level)
+## 🧩 Clean Database Architecture
 
-## 📘 Data Dictionary
+The clean layer makes the data ready for **Analytics and ML**.
 
-This Data Dictionary provides a structured overview of the **Steam Dataset 2025** schema and serves as a reference for understanding tables, relationships, and key attributes used throughout the analytics pipeline.
-
----
-
-### 🔹 Purpose
-The data dictionary defines the structure, meaning, and data types of all major tables in the dataset. It enables:
-- Consistent data interpretation  
-- Easier analytics and ML development  
-- Faster onboarding for new users of the dataset  
+![Clean Database Architecture](diagrams/cleaned_database_architecture.png)
 
 ---
 
-### 🔹 Dataset Scope
-- **Total Games:** 239,664  
-- **Total Reviews:** 1,048,148  
-- **Schema Type:** Normalized relational model with JSON and embedding support  
-- **Primary Use:** Big data analytics, sentiment analysis, and machine learning  
+## 🏗️ Project Architecture
+
+SteamSAGE is designed as a **cloud-native analytics and AI solution**.
+
+![Project Architecture](diagrams/Architecture_Diagram_colored.jpeg)
+
+### Architecture Overview
+
+1. **Data Source**
+
+   - Steam Dataset 2025 (Kaggle)
+
+2. **Storage**
+
+   - Amazon S3
+
+3. **Processing**
+
+   - AWS Glue
+
+4. **Semantic Layer**
+
+   - Sentence Transformers (Game description)
+
+5. **Analytics & Visualization**
+
+   - Power BI dashboards
+
+6. **Serving**
+
+   - Hugging Face based semantic search app
 
 ---
 
-### 🔹 Core Tables
+## 📊 Power BI Analytics
 
-#### `applications`
-Stores detailed metadata for each Steam application (games, DLCs, software).
+SteamSAGE includes rich interactive dashboards covering:
 
-| Column | Description |
-|------|-------------|
-| `appid` | Unique Steam application ID |
-| `name` | Game or application name |
-| `type` | Game, DLC, software, etc. |
-| `is_free` | Free-to-play indicator |
-| `release_date` | Official release date |
-| `final_price` | Final price after discount |
-| `metacritic_score` | Metacritic rating |
-| `supports_windows / mac / linux` | Platform support flags |
-| `description_embedding` | Vector embedding for semantic search |
+- Game distribution by platform
+- Free vs Paid games analysis
+- Pricing vs engagement
+- Top genres, developers, publishers
+- Metacritic score distributions
+- Review engagement trends
 
----
 
-#### `reviews`
-Contains user-generated reviews and engagement metrics.
+## 🔍 Semantic Search Model (Live Demo)
 
-| Column | Description |
-|------|-------------|
-| `recommendationid` | Unique review ID |
-| `appid` | Referenced application |
-| `review_text` | Review content |
-| `voted_up` | Positive or negative review |
-| `votes_up` | Helpful votes |
-| `votes_funny` | Funny votes |
-| `weighted_vote_score` | Review helpfulness score |
-| `review_embedding` | Text embedding for sentiment & similarity |
+We built a **working semantic search engine** and deployed on Hugging Face.
+
+### 🔗 Live Model
+
+👉 **[SteamSAGE Semantic Search – Hugging Face App](https://shasta-thermodynamic-glossarially.ngrok-free.dev)**
+
+### 📸 Model Screenshot
+![Model Screenshot](diagrams/model_screenshot.jpg)
+**Capabilities:**
+
+- Search games by *meaning*, not keywords
+- Query using natural language
+- Retrieve semantically similar games & reviews score
 
 ---
 
-### 🔹 Lookup Tables
 
-| Table | Description |
-|------|-------------|
-| `developers` | Unique game developers |
-| `publishers` | Game publishers |
-| `genres` | Game genres (Action, RPG, etc.) |
-| `categories` | Steam feature categories |
-| `platforms` | Supported OS platforms |
+## 🧠 Key Learnings
+
+- Raw Steam data is not analytics-ready without some transformation
+- Outliers skew gaming metrics
+- Semantic embeddings unlock insights impossible with SQL alone
+- BI + NLP together provide *context + explanation*
 
 ---
 
-### 🔹 Relationship (Junction) Tables
+## 🔮 Future Enhancements
 
-| Table | Purpose |
-|------|--------|
-| `application_developers` | Links games to developers |
-| `application_publishers` | Links games to publishers |
-| `application_genres` | Links games to genres |
-| `application_categories` | Links games to features |
-| `application_platforms` | Links games to platforms |
-
-These tables enable **many-to-many relationships** between applications and descriptive entities.
+- Real-time ingestion & streaming analytics
+- Game Success Predictor
 
 ---
-
-### 🔹 Embedding & ML Support
-
-| Table | Description |
-|------|-------------|
-| `embedding_runs` | Tracks embedding generation metadata |
-| `description_embedding` | Game-level semantic vector |
-| `review_embedding` | Review-level semantic vector |
-
-- Embedding dimension: **1024**
-- Used for: sentiment analysis, semantic search, recommendations
-
----
-
-### 🔹 Data Types Used
-- `int64` – Identifiers and counts  
-- `float64` – Prices, scores, metrics  
-- `bool` – Flags (free-to-play, platform support)  
-- `object / text` – Descriptions, reviews  
-- `vector` – ML embeddings  
-
----
-
-### 🔹 Usage Notes
-- Foreign keys ensure referential integrity
-- Preprocessed columns improve Spark and SQL performance
-- Embeddings enable advanced NLP and similarity search
-- Schema supports scalable analytics and ML workloads
-
----
-
-This Data Dictionary should be used alongside the main `README.md` and analytics notebooks to ensure correct interpretation and usage of the dataset.
-
-
----
-
-## 📊 Key Performance Indicators (KPIs)
-
-### 1️⃣ Data Volume KPIs
-- 239K+ Games collected  
-- 1M+ User reviews processed  
-- 13+ Normalized tables  
-
-### 2️⃣ Data Quality KPIs
-- 99% schema completeness  
-- <1% missing fields in key tables  
-
-### 3️⃣ Processing KPIs
-- High-throughput API ingestion  
-- Low ETL batch latency  
-- Fast embedding generation  
-
-### 4️⃣ Database Performance KPIs
-- Metadata query latency < 100 ms  
-- Vector search latency < 50 ms  
-- Index hit rate > 90%  
-
-### 5️⃣ Analytics KPIs
-- 50+ genres analyzed  
-- Platform coverage: Windows / macOS / Linux  
-- Sentiment accuracy > 85%  
-
-### 6️⃣ User Interaction KPIs
-- Search response time < 200 ms  
-- Recommendation similarity > 0.75  
-- Positive vs negative sentiment tracking  
-
-### 7️⃣ System Reliability KPIs
-- 99% uptime  
-- Pipeline failure rate < 1%  
-
----
-
-## 🏗️ System Architecture (High-Level)
-
-
-![Steam Big Data Architecture](diagrams/Architecture_Diagram_colored.jpeg)
 
