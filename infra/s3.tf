@@ -1,8 +1,13 @@
-# -----------------------------
+
 # S3 Bucket (Data Lake)
-# -----------------------------
+
+resource "random_id" "bucket_suffix" {
+  byte_length = 4
+}
+
 resource "aws_s3_bucket" "data_lake" {
-  bucket = var.data_bucket_name
+  # Creates a unique name like: steam-analytics-dev-a9b3c4
+  bucket = "${var.project_name}-${var.environment}-${random_id.bucket_suffix.hex}"
 
   tags = {
     Project     = var.project_name
@@ -10,9 +15,9 @@ resource "aws_s3_bucket" "data_lake" {
   }
 }
 
-# -----------------------------
+
 # Block ALL public access
-# -----------------------------
+
 resource "aws_s3_bucket_public_access_block" "data_lake_block" {
   bucket = aws_s3_bucket.data_lake.id
 
@@ -22,9 +27,9 @@ resource "aws_s3_bucket_public_access_block" "data_lake_block" {
   restrict_public_buckets = true
 }
 
-# -----------------------------
+
 # Enable versioning
-# -----------------------------
+
 resource "aws_s3_bucket_versioning" "data_lake_versioning" {
   bucket = aws_s3_bucket.data_lake.id
 
@@ -33,9 +38,9 @@ resource "aws_s3_bucket_versioning" "data_lake_versioning" {
   }
 }
 
-# -----------------------------
+
 # Server-side encryption
-# -----------------------------
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "data_lake_encryption" {
   bucket = aws_s3_bucket.data_lake.id
 
@@ -46,9 +51,9 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "data_lake_encrypt
   }
 }
 
-# -----------------------------
+
 # Logical prefixes (folders)
-# -----------------------------
+
 resource "aws_s3_object" "raw_prefix" {
   bucket = aws_s3_bucket.data_lake.id
   key    = "raw/"
@@ -57,11 +62,6 @@ resource "aws_s3_object" "raw_prefix" {
 resource "aws_s3_object" "silver_prefix" {
   bucket = aws_s3_bucket.data_lake.id
   key    = "silver/"
-}
-
-resource "aws_s3_object" "gold_prefix" {
-  bucket = aws_s3_bucket.data_lake.id
-  key    = "gold/"
 }
 
 resource "aws_s3_object" "glue_scripts_prefix" {
@@ -73,3 +73,6 @@ resource "aws_s3_object" "athena_results_prefix" {
   bucket = aws_s3_bucket.data_lake.id
   key    = "athena-results/"
 }
+
+
+
