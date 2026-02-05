@@ -45,7 +45,7 @@ reviews_input = f"{RAW_BASE}/reviews.csv"
 review_score_input = f"{SCORES_BASE}/reviews/reviews_scored_final.csv"
 
 # Output goes to SILVER_BASE (New Bucket)
-review_out_parquet = f"{SILVER_BASE}/reviews/bi_reviews_capped/parquet/"
+review_out_parquet = f"{SILVER_BASE}/reviews/bi_reviews/"
 
 # =============================================================================
 # Read RAW reviews
@@ -179,3 +179,4 @@ print(f"Writing output to: {review_out_parquet}")
 review_fact_df.write.mode("overwrite").parquet(review_out_parquet)
 
 print("Reviews job completed successfully.")
+
