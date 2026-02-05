@@ -1,6 +1,6 @@
-# -----------------------------
+
 # Athena Database
-# -----------------------------
+
 resource "aws_athena_database" "steam_db" {
   name   = var.athena_database_name
   bucket = aws_s3_bucket.data_lake.bucket
@@ -8,9 +8,9 @@ resource "aws_athena_database" "steam_db" {
   comment = "Athena database for Steam analytics curated datasets"
 }
 
-# -----------------------------
+
 # Athena Workgroup
-# -----------------------------
+
 resource "aws_athena_workgroup" "steam_workgroup" {
   name = "${var.project_name}-workgroup-${var.environment}"
 
@@ -27,3 +27,4 @@ resource "aws_athena_workgroup" "steam_workgroup" {
     Environment = var.environment
   }
 }
+
