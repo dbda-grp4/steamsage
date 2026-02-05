@@ -12,3 +12,20 @@
 # Large files
 
 6. Sentiment Score Generator/sentiment_model_local/
+
+# Python
+__pycache__/
+*.pyc
+
+# Notebooks
+*.ipynb_checkpoints/
+
+# Large models
+sentiment_model_local/
+*.bin
+*.pt
+
+# Office / dashboards
+*.docx
+*.rtf
+*.pbix
