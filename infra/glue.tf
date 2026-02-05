@@ -37,9 +37,8 @@ resource "aws_glue_job" "applications_job" {
   }
 }
 
-# -----------------------------
 # Reviews Job
-# -----------------------------
+
 resource "aws_glue_job" "reviews_job" {
   name     = "${var.project_name}-reviews-job-${var.environment}"
   role_arn = aws_iam_role.glue_role.arn
@@ -113,17 +112,17 @@ resource "aws_glue_crawler" "silver_crawler" {
   database_name = aws_athena_database.steam_db.name
   role          = aws_iam_role.glue_role.arn
 
-  # 🎯 Target 1: Applications
+  # Target 1: Applications
   s3_target {
     path = "s3://${aws_s3_bucket.data_lake.bucket}/silver/applications/"
   }
 
-  # 🎯 Target 2: Reviews
+  # Target 2: Reviews
   s3_target {
     path = "s3://${aws_s3_bucket.data_lake.bucket}/silver/reviews/"
   }
 
-  # 🎯 Target 3: Dimensions
+  # Target 3: Dimensions
   s3_target {
     path = "s3://${aws_s3_bucket.data_lake.bucket}/silver/dimensions/"
   }
@@ -138,6 +137,7 @@ resource "aws_glue_crawler" "silver_crawler" {
     Environment = var.environment
   }
 }
+
 
 
 
