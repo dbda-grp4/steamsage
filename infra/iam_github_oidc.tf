@@ -1,6 +1,6 @@
-# ---------------------------------------------------------
+
 # 1. GitHub OIDC Provider
-# ---------------------------------------------------------
+
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
 
@@ -13,9 +13,9 @@ resource "aws_iam_openid_connect_provider" "github" {
   ]
 }
 
-# ---------------------------------------------------------
+
 # 2. The IAM Role (Identity)
-# ---------------------------------------------------------
+
 resource "aws_iam_role" "github_actions_role" {
   name = "${var.project_name}-oidc-${random_id.bucket_suffix.hex}"
 
@@ -41,9 +41,9 @@ resource "aws_iam_role" "github_actions_role" {
   })
 }
 
-# ---------------------------------------------------------
+
 # 3. The Permissions (Allow Upload to S3)
-# ---------------------------------------------------------
+
 resource "aws_iam_role_policy" "github_actions_permissions" {
   name = "github-actions-permissions"
   role = aws_iam_role.github_actions_role.id
@@ -81,4 +81,5 @@ resource "aws_iam_role_policy" "github_actions_permissions" {
     ]
   })
 }
+
 
