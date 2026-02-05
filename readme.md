@@ -56,7 +56,7 @@ The raw dataset closely mirrors the Steam API structure and contains deeply nest
 
 The clean layer makes the data ready for **Analytics and ML**.
 
-![Clean Database Architecture](diagrams/clean_database_architecture.png)
+![Clean Database Architecture](diagrams/cleaned_database_architecture.png)
 
 ---
 
