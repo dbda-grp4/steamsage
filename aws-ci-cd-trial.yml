@@ -1,0 +1,49 @@
+name: AWS CI/CD Trial Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  aws-test:
+    name: Test GitHub Actions → AWS Connectivity
+    runs-on: ubuntu-latest
+
+    steps:
+      # ----------------------------------------------------
+      # 1. Checkout repository
+      # ----------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ----------------------------------------------------
+      # 2. Configure AWS credentials
+      # ----------------------------------------------------
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      # ----------------------------------------------------
+      # 3. Verify AWS identity (IMPORTANT STEP)
+      # ----------------------------------------------------
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
+
+      # ----------------------------------------------------
+      # 4. Create a test file inside the runner
+      # ----------------------------------------------------
+      - name: Create test file
+        run: |
+          echo "GitHub Actions successfully connected to AWS" > cicd_test.txt
+          echo "Timestamp:" >> cicd_test.txt
+          date >> cicd_test.txt
+
+      # ----------------------------------------------------
+      # 5. Upload test file to S3
+      # ----------------------------------------------------
+      - name: Upload test file to S3
+        run: |
+          aws s3 cp cicd_test.txt s3://steam-ci-cd-test-bucket1/cicd_test.txt
+
