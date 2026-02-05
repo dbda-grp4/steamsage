@@ -3,7 +3,10 @@ name: Deploy & Run Glue ETL Pipeline
 on:
   push:
     branches: [ "main" ]
-    paths: [ "glue/**", "infra/**" ]
+    paths: 
+      - "glue/**"
+      - "infra/**"
+      - ".github/workflows/**"
   workflow_dispatch:
 
 permissions:
