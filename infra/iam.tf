@@ -1,6 +1,5 @@
-# -----------------------------
 # Glue IAM Role
-# -----------------------------
+
 resource "aws_iam_role" "glue_role" {
   name = "${var.project_name}-glue-role-${var.environment}"
 
@@ -23,9 +22,8 @@ resource "aws_iam_role" "glue_role" {
   }
 }
 
-# -----------------------------
 # Glue IAM Policy
-# -----------------------------
+
 resource "aws_iam_policy" "glue_policy" {
   name        = "${var.project_name}-glue-policy-${var.environment}"
   description = "Permissions for AWS Glue jobs to access S3, logs, and Glue resources"
@@ -87,17 +85,17 @@ resource "aws_iam_policy" "glue_policy" {
   })
 }
 
-# -----------------------------
+
 # Attach policy to role
-# -----------------------------
+
 resource "aws_iam_role_policy_attachment" "glue_policy_attach" {
   role       = aws_iam_role.glue_role.name
   policy_arn = aws_iam_policy.glue_policy.arn
 }
 
-# ---------------------------------------------------------
+
 # Grant Access to the EXISTING Data Bucket (S3 + KMS)
-# ---------------------------------------------------------
+
 resource "aws_iam_role_policy" "glue_access_existing_data" {
   name = "glue-access-existing-data"
   role = aws_iam_role.glue_role.id
@@ -132,6 +130,7 @@ resource "aws_iam_role_policy" "glue_access_existing_data" {
     ]
   })
 }
+
 
 
 
