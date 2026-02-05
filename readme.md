@@ -2,6 +2,7 @@
 
 > **SteamSAGE** is a big data analytics and semantic search platform built on data of Steam Platform. It combines advanced analytics, and NLP-powered semantic-search to understand *how games are priced, reviewed, and experienced by players*.
 
+![SteamSAGE Logo](diagrams/SteamSAGE_logo.png)
 ---
 
 ## 🚀 Motivation
@@ -112,10 +113,10 @@ We built a **working semantic search engine** and deployed on Hugging Face.
 
 ### 🔗 Live Model
 
-👉 **[SteamSAGE Semantic Search – Hugging Face App](PUT_YOUR_HF_LINK_HERE)**
+👉 **[SteamSAGE Semantic Search – Hugging Face App](https://shasta-thermodynamic-glossarially.ngrok-free.dev)**
 
 ### 📸 Model Screenshot
-
+![Model Screenshot](diagrams/model_screenshot.jpg)
 **Capabilities:**
 
 - Search games by *meaning*, not keywords
