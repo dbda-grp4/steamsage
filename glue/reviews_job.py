@@ -4,52 +4,42 @@ from pyspark.sql.functions import (col, when, from_unixtime, to_date, year, mont
 from awsglue.context import GlueContext
 from awsglue.utils import getResolvedOptions
 
-# --------------------------------------------------
 # Glue job arguments
-# --------------------------------------------------
 args = getResolvedOptions(
     sys.argv, 
     [
         'JOB_NAME',
         'RAW_BASE',     # Old Bucket (Raw)
         'SILVER_BASE',  # New Bucket (Output)
-        'SCORES_BASE'   # Old Bucket (Silver/Scores) -> NEW ARGUMENT
+        'SCORES_BASE'   # Old Bucket (Silver/Scores)
     ]
 )
 
-# --------------------------------------------------
-# DYNAMIC PATHS
-# --------------------------------------------------
+# Dynamic Paths
 RAW_BASE    = args['RAW_BASE']
 SILVER_BASE = args['SILVER_BASE']
-SCORES_BASE = args['SCORES_BASE'] # This points to your Old Bucket
+SCORES_BASE = args['SCORES_BASE']
 
 print(f"Starting Glue job: {args['JOB_NAME']}")
 print(f"RAW_BASE (Input): {RAW_BASE}")
 print(f"SCORES_BASE (Input): {SCORES_BASE}")
 print(f"SILVER_BASE (Output): {SILVER_BASE}")
 
-# --------------------------------------------------
 # Glue Context
-# --------------------------------------------------
 sc = SparkContext.getOrCreate()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 
-# --------------------------------------------------
 # Input / Output paths
-# --------------------------------------------------
 reviews_input = f"{RAW_BASE}/reviews.csv"
 
-# Use SCORES_BASE (Old Bucket) to find the file
+# Using SCORES_BASE (Old Bucket) to find the file
 review_score_input = f"{SCORES_BASE}/reviews/reviews_scored_final.csv"
 
 # Output goes to SILVER_BASE (New Bucket)
 review_out_parquet = f"{SILVER_BASE}/reviews/bi_reviews/"
 
-# =============================================================================
-# Read RAW reviews
-# =============================================================================
+# Reading RAW reviews
 reviews_df = (
     spark.read
     .format("csv")
@@ -63,9 +53,7 @@ reviews_df = (
     .load(reviews_input)
 )
 
-# =============================================================================
-# Select required columns
-# =============================================================================
+# Selecting required columns
 bi_reviews_df = reviews_df.select(
     "recommendationid",
     "appid",
@@ -78,9 +66,7 @@ bi_reviews_df = reviews_df.select(
     "timestamp_created"
 )
 
-# =============================================================================
-# Convert playtime (minutes → hours → capped)
-# =============================================================================
+# Converting playtime (minutes → hours → capped)
 PLAYTIME_HOURS_P95 = 67.6  #calculated in EDA
 
 bi_reviews_df = (
@@ -93,17 +79,13 @@ bi_reviews_df = (
     )
 )
 
-# =============================================================================
 # Engagement metric
-# =============================================================================
 bi_reviews_df = bi_reviews_df.withColumn(
     "review_reactions",
     col("votes_up") + col("votes_funny")
 )
 
-# =============================================================================
 # Time dimensions
-# =============================================================================
 bi_reviews_df = (
     bi_reviews_df
     .withColumn("review_timestamp", from_unixtime(col("timestamp_created")))
@@ -111,9 +93,7 @@ bi_reviews_df = (
     .withColumn("review_year", year(col("review_timestamp")))
 )
 
-# =============================================================================
-# Drop intermediates
-# =============================================================================
+# Droping intermediates
 bi_reviews_df = bi_reviews_df.drop(
     "votes_up",
     "votes_funny",
@@ -123,9 +103,7 @@ bi_reviews_df = bi_reviews_df.drop(
     "review_timestamp"
 )
 
-# =============================================================================
-# Read SENTIMENT FILE  
-# =============================================================================
+# Reading SENTIMENT FILE  
 review_score_df = (
     spark.read
     .option("header", "true")
@@ -134,9 +112,7 @@ review_score_df = (
     .withColumnRenamed("category", "review_category") 
 )
 
-# =============================================================================
-# Join sentiment data
-# =============================================================================
+# Joining sentiment data
 review_fact_df = (
     bi_reviews_df
     .join(
@@ -146,18 +122,14 @@ review_fact_df = (
     )
 )
 
-# =============================================================================
-# Clean blanks → NULL
-# =============================================================================
+# Cleaning blanks → NULL
 for c in ["language", "review_category"]:
     review_fact_df = review_fact_df.withColumn(
         c,
         when(trim(col(c)) == "", None).otherwise(col(c))
     )
 
-# =============================================================================
-# Final projection (NO category reference anymore)
-# =============================================================================
+# Final projection
 review_fact_df = review_fact_df.select(
     "recommendationid",
     "appid",
@@ -172,10 +144,9 @@ review_fact_df = review_fact_df.select(
     "numeric_score"
 )
 
-# --------------------------------------------------
-# Write SILVER output (Parquet)
-# --------------------------------------------------
+# Writing output to SILVER (Parquet format)
 review_fact_df.write.mode("overwrite").parquet(review_out_parquet)
+
 
 
 
