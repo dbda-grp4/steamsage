@@ -30,7 +30,7 @@ print(f"SILVER_BASE: {SILVER_BASE}")
 
 # Define Input/Output paths based on dynamic bases
 applications_input = f"{RAW_BASE}/applications.csv"
-applications_capped_parquet = f"{SILVER_BASE}/applications/bi_applications/"
+applications_out_parquet = f"{SILVER_BASE}/applications/bi_applications/"
 
 # --------------------------------------------------
 # Glue Context
@@ -248,8 +248,9 @@ bi_applications_capped_df = bi_applications_capped_df.withColumn(
 # Write SILVER outputs (Parquet only)
 # --------------------------------------------------
 
-print(f"Writing capped data to: {applications_capped_parquet}")
-bi_applications_capped_df.write.mode("overwrite").parquet(applications_capped_parquet)
+print(f"Writing capped data to: {applications_out_parquet}")
+bi_applications_capped_df.write.mode("overwrite").parquet(applications_out_parquet)
 
 print("Applications job completed successfully.")
+
 
