@@ -157,5 +157,3 @@ app_publishers_rows_df.write.mode("overwrite").parquet(out_publishers)
 app_genres_rows_df.write.mode("overwrite").parquet(out_genres)
 app_categories_rows_df.write.mode("overwrite").parquet(out_categories)
 app_platforms_rows_df.write.mode("overwrite").parquet(out_platforms)
-
-print("Dimensions job completed successfully.")
