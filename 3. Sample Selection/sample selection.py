@@ -1,7 +1,3 @@
-# Generated from: sample selection.ipynb
-# Converted at: 2026-01-28T04:21:41.587Z
-# Next step (optional): refactor into modules & generate tests with RunCell
-# Quick start: pip install runcell
 
 masterdata_df = spark.read\
     .format("csv")\
