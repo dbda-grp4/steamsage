@@ -1,4 +1,3 @@
-
 # Glue Jobs
 
 locals {
@@ -61,7 +60,7 @@ resource "aws_glue_job" "reviews_job" {
     # INPUT 2: Scores Data (Old Bucket - Silver Folder)
     "--SCORES_BASE" = "s3://steam-analytics-steam-analytics-aman-2026/silver"
 
-    # OUTPUT: New Dynamic Bucket
+    # OUTPUT: Writing to the new dynamic bucket
     "--SILVER_BASE" = "s3://${aws_s3_bucket.data_lake.bucket}/silver"
     "--job-language" = "python"
   }
@@ -104,9 +103,8 @@ resource "aws_glue_job" "dimensions_job" {
   }
 }
 
-# -----------------------------
 # Glue Crawler (Silver Layer)
-# -----------------------------
+
 resource "aws_glue_crawler" "silver_crawler" {
   name          = "${var.project_name}-silver-crawler-${var.environment}"
   database_name = aws_athena_database.steam_db.name
@@ -137,8 +135,3 @@ resource "aws_glue_crawler" "silver_crawler" {
     Environment = var.environment
   }
 }
-
-
-
-
-
