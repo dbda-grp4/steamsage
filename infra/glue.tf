@@ -109,48 +109,28 @@ resource "aws_glue_job" "dimensions_job" {
 }
 
 # -----------------------------
-# Master Job (GOLD)
+# Glue Crawler (Silver Layer)
 # -----------------------------
-resource "aws_glue_job" "master_job" {
-  name     = "${var.project_name}-master-job-${var.environment}"
-  role_arn = aws_iam_role.glue_role.arn
-
-  glue_version       = var.glue_version
-  worker_type        = var.glue_worker_type
-  number_of_workers  = var.glue_number_of_workers
-  timeout            = var.glue_timeout
-
-  command {
-    name            = "glueetl"
-    script_location = "${local.glue_scripts_path}/master_job.py"
-    python_version  = "3"
-  }
-
-  default_arguments = {
-    "--SILVER_BASE" = "s3://${aws_s3_bucket.data_lake.bucket}/silver"
-    "--GOLD_BASE"   = "s3://${aws_s3_bucket.data_lake.bucket}/gold"
-    "--job-language" = "python"
-  }
-
-  tags = {
-    Project     = var.project_name
-    Environment = var.environment
-  }
-}
-
-# -----------------------------
-# Glue Crawler (Gold Layer)
-# -----------------------------
-resource "aws_glue_crawler" "gold_crawler" {
-  name          = "${var.project_name}-gold-crawler-${var.environment}"
+resource "aws_glue_crawler" "silver_crawler" {
+  name          = "${var.project_name}-silver-crawler-${var.environment}"
   database_name = aws_athena_database.steam_db.name
   role          = aws_iam_role.glue_role.arn
 
+  # 🎯 Target 1: Applications
   s3_target {
-    path = "s3://${aws_s3_bucket.data_lake.bucket}/gold/masterdata/parquet/"
+    path = "s3://${aws_s3_bucket.data_lake.bucket}/silver/applications/"
   }
 
-  # Automatically add new columns if schema evolves, but only log deletions
+  # 🎯 Target 2: Reviews
+  s3_target {
+    path = "s3://${aws_s3_bucket.data_lake.bucket}/silver/reviews/"
+  }
+
+  # 🎯 Target 3: Dimensions
+  s3_target {
+    path = "s3://${aws_s3_bucket.data_lake.bucket}/silver/dimensions/"
+  }
+
   schema_change_policy {
     delete_behavior = "LOG"
     update_behavior = "UPDATE_IN_DATABASE"
@@ -162,6 +142,5 @@ resource "aws_glue_crawler" "gold_crawler" {
   }
 }
 
-#name : -aman
 
 
