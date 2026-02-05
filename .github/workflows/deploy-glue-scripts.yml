@@ -189,42 +189,18 @@ jobs:
             sleep 30
           done
 
-      # ---------------- MASTER JOB ----------------
-      - name: Run master job
+# ---------------- SILVER CRAWLER (ADDED) ----------------
+      - name: Run Silver Crawler
         run: |
-          RUN_ID=$(aws glue start-job-run \
-            --job-name steam-analytics-master-job-dev \
-            --query JobRunId --output text)
-
-          while true; do
-            STATUS=$(aws glue get-job-run \
-              --job-name steam-analytics-master-job-dev \
-              --run-id $RUN_ID \
-              --query JobRun.JobRunState --output text)
-
-            echo "Master status: $STATUS"
-
-            if [ "$STATUS" = "SUCCEEDED" ]; then
-              break
-            elif [ "$STATUS" = "FAILED" ] || [ "$STATUS" = "STOPPED" ]; then
-              exit 1
-            fi
-
-            sleep 30
-          done
-
-# ---------------- GOLD CRAWLER (ADDED) ----------------
-      - name: Run Gold Crawler
-        run: |
-          echo "Starting Gold Crawler..."
-          aws glue start-crawler --name steam-analytics-gold-crawler-dev
+          echo "Starting Silver Crawler..."
+          aws glue start-crawler --name steam-analytics-silver-crawler-dev
 
           # Give it a moment to shift to RUNNING state
           sleep 10
 
           while true; do
             STATUS=$(aws glue get-crawler \
-              --name steam-analytics-gold-crawler-dev \
+              --name steam-analytics-silver-crawler-dev \
               --query Crawler.State --output text)
 
             echo "Crawler status: $STATUS"
