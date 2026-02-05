@@ -5,9 +5,8 @@ from awsglue.context import GlueContext
 from awsglue.utils import getResolvedOptions
 from pyspark.sql.functions import (col, when, countDistinct, count, lit, isnan, to_date, expr, year)
 
-# --------------------------------------------------
+
 # Glue job arguments
-# --------------------------------------------------
 args = getResolvedOptions(
     sys.argv,
     [
@@ -17,10 +16,7 @@ args = getResolvedOptions(
     ]
 )
 
-# --------------------------------------------------
-# DYNAMIC PATHS (The Fix)
-# --------------------------------------------------
-# We use the arguments passed by Terraform instead of hardcoding
+# Dynamic Paths (using the arguments passed by Terraform instead of hardcoding)
 RAW_BASE = args['RAW_BASE']
 SILVER_BASE = args['SILVER_BASE']
 
@@ -28,20 +24,16 @@ print(f"Starting Glue job: {args['JOB_NAME']}")
 print(f"RAW_BASE: {RAW_BASE}")
 print(f"SILVER_BASE: {SILVER_BASE}")
 
-# Define Input/Output paths based on dynamic bases
+# Defining Input/Output paths based on dynamic bases
 applications_input = f"{RAW_BASE}/applications.csv"
 applications_out_parquet = f"{SILVER_BASE}/applications/bi_applications/"
 
-# --------------------------------------------------
 # Glue Context
-# --------------------------------------------------
 sc = SparkContext.getOrCreate()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 
-# --------------------------------------------------
-# Read raw applications
-# --------------------------------------------------
+# Reading raw applications
 applications_df = (
     spark.read
     .option("header", "true")
@@ -49,9 +41,7 @@ applications_df = (
     .csv(applications_input)
 )
 
-# --------------------------------------------------
-# Base BI selection
-# --------------------------------------------------
+# Base column selection
 bi_applications_df = applications_df.select(
     "appid",
     "name",
@@ -71,17 +61,14 @@ bi_applications_df = applications_df.select(
     "required_age"
 )
 
-# --------------------------------------------------
-# Clean metacritic_score (numeric only)
-# --------------------------------------------------
+
+# Cleaning metacritic_score (keeping numeric values only)
 bi_applications_df = bi_applications_df.withColumn(
     "metacritic_score",
     col("metacritic_score").cast("double")
 )
 
-# --------------------------------------------------
-# Clean & cap required_age (max 40)
-# --------------------------------------------------
+# Cleaning & capping required_age (max age upto 40)
 bi_applications_df = bi_applications_df.withColumn(
     "required_age",
     when(col("required_age").cast("int").isNull(), None)
@@ -89,9 +76,7 @@ bi_applications_df = bi_applications_df.withColumn(
     .otherwise(col("required_age").cast("int"))
 )
 
-# --------------------------------------------------
-# Clean & cap release_date (max year 2035)
-# --------------------------------------------------
+# Cleaning & capping release_date (max year upto 2035)
 bi_applications_df = bi_applications_df.withColumn(
     "release_date",
     when(to_date(col("release_date")).isNull(), None)
@@ -99,9 +84,7 @@ bi_applications_df = bi_applications_df.withColumn(
     .otherwise(to_date(col("release_date")))
 )
 
-# --------------------------------------------------
-# Clean & rename discount percent (0–100)
-# --------------------------------------------------
+# Cleaning & renaming discount percent (Only keeping values in range 0–100)
 bi_applications_df = (
     bi_applications_df
     .withColumn(
@@ -114,18 +97,14 @@ bi_applications_df = (
     .drop("mat_discount_percent")
 )
 
-# --------------------------------------------------
-# Derive release_year
-# --------------------------------------------------
+# Deriving release_year
 bi_applications_df = bi_applications_df.withColumn(
     "release_year",
     when(col("release_date").isNull(), None)
     .otherwise(year(col("release_date")))
 )
 
-# --------------------------------------------------
-# Ensure numeric types for quantile computation
-# --------------------------------------------------
+# Ensuring all values are of numeric types for quantile computation
 bi_applications_df = (
     bi_applications_df
     .withColumn("mat_initial_price", col("mat_initial_price").cast("double"))
@@ -134,18 +113,14 @@ bi_applications_df = (
     .withColumn("mat_achievement_count", col("mat_achievement_count").cast("double"))
 )
 
-
-# --------------------------------------------------
-# Compute p99 thresholds
-# --------------------------------------------------
+# Computing p99 thresholds
 price_init_p99 = bi_applications_df.approxQuantile("mat_initial_price", [0.99], 0.01)[0]
 price_final_p99 = bi_applications_df.approxQuantile("mat_final_price", [0.99], 0.01)[0]
 reco_p99 = bi_applications_df.approxQuantile("recommendations_total", [0.99], 0.01)[0]
 ach_p99 = bi_applications_df.approxQuantile("mat_achievement_count", [0.99], 0.01)[0]
 
-# --------------------------------------------------
-# Apply p99 capping
-# --------------------------------------------------
+
+# Applying p99 capping
 bi_applications_capped_df = (
     bi_applications_df
     .withColumn(
@@ -170,9 +145,7 @@ bi_applications_capped_df = (
     )
 )
 
-# --------------------------------------------------
-# Derived prices
-# --------------------------------------------------
+# Deriving prices
 bi_applications_capped_df = bi_applications_capped_df.withColumn(
     "initial_price",
     when(col("mat_initial_price_capped").isNull() | isnan(col("mat_initial_price_capped")), None)
@@ -187,9 +160,8 @@ bi_applications_capped_df = bi_applications_capped_df.withColumn(
     .otherwise(col("mat_final_price_capped"))
 )
 
-# --------------------------------------------------
-# price_type
-# --------------------------------------------------
+
+# Deriving price_type
 bi_applications_capped_df = bi_applications_capped_df.withColumn(
     "price_type",
     when(col("is_free") == True, "Free")
@@ -197,9 +169,7 @@ bi_applications_capped_df = bi_applications_capped_df.withColumn(
     .otherwise(None)
 )
 
-# --------------------------------------------------
-# platform_support_type
-# --------------------------------------------------
+# Deriving platform_support_type
 bi_applications_capped_df = bi_applications_capped_df.withColumn(
     "platform_support_type",
     when(
@@ -230,9 +200,7 @@ bi_applications_capped_df = bi_applications_capped_df.withColumn(
     .otherwise("Other")
 )
 
-# --------------------------------------------------
-# price_band
-# --------------------------------------------------
+# Deriving price_band
 bi_applications_capped_df = bi_applications_capped_df.withColumn(
     "price_band",
     when(col("price_type") == "Free", "Free")
@@ -244,10 +212,9 @@ bi_applications_capped_df = bi_applications_capped_df.withColumn(
     .otherwise("$60+")
 )
 
-# --------------------------------------------------
-# Write SILVER outputs (Parquet only)
-# --------------------------------------------------
+# Writing output to SILVER (Parquet format)
 bi_applications_capped_df.write.mode("overwrite").parquet(applications_out_parquet)
+
 
 
 
