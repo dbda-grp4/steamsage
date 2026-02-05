@@ -247,10 +247,7 @@ bi_applications_capped_df = bi_applications_capped_df.withColumn(
 # --------------------------------------------------
 # Write SILVER outputs (Parquet only)
 # --------------------------------------------------
-
-print(f"Writing capped data to: {applications_out_parquet}")
 bi_applications_capped_df.write.mode("overwrite").parquet(applications_out_parquet)
 
-print("Applications job completed successfully.")
 
 
