@@ -64,11 +64,6 @@ resource "aws_s3_object" "silver_prefix" {
   key    = "silver/"
 }
 
-resource "aws_s3_object" "gold_prefix" {
-  bucket = aws_s3_bucket.data_lake.id
-  key    = "gold/"
-}
-
 resource "aws_s3_object" "glue_scripts_prefix" {
   bucket = aws_s3_bucket.data_lake.id
   key    = "glue-scripts/"
@@ -78,4 +73,5 @@ resource "aws_s3_object" "athena_results_prefix" {
   bucket = aws_s3_bucket.data_lake.id
   key    = "athena-results/"
 }
+
 
