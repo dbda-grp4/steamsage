@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Steam Game Finder</title>
+<title>SteamSAGE</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -112,13 +112,15 @@ button:disabled {
 }
 
 .card {
-  background: var(--card);
-  border-radius: 14px;
+  background: rgba(42,71,94,0.5);
+  border-radius: 12px;
   overflow: hidden;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  transition: transform .12s ease, box-shadow .12s ease;
+  border: 1px solid rgba(102,192,244,0.15);
+
+  display: flex;
+  flex-direction: column;
 }
+
 
 .card:hover{
   transform: translateY(-2px);
@@ -134,7 +136,12 @@ button:disabled {
 
 .content {
   padding: 14px;
+
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
+
 
 .title {
   font-weight: 900;
@@ -178,7 +185,10 @@ button:disabled {
 .actions {
   display: flex;
   gap: 10px;
+  margin-top: auto;   
+  padding-top: 12px;  
 }
+
 
 .actions a {
   flex: 1;
@@ -254,6 +264,7 @@ button:disabled {
   padding: 10px 14px;
   border-radius: 10px;
   cursor:pointer;
+  width: fit-content;
 }
 
 .modalBody{
@@ -291,9 +302,9 @@ button:disabled {
   }
 }
 
-.navBtn{
+/* .navBtn{
   position:absolute;
-  top: 50%;
+  top: 80%;
   transform: translateY(-50%);
   border:none;
   background: rgba(0,0,0,.45);
@@ -306,8 +317,49 @@ button:disabled {
 }
 
 .navBtn:hover{ background: rgba(0,0,0,.6); }
-.navBtn.left{ left: 12px; }
-.navBtn.right{ right: 12px; }
+.navBtn.left{ right: 12px; }
+.navBtn.right{ left: 12px; } */
+
+.navBtn{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  
+  width: 46px;
+  height: 46px;
+  padding: 0;
+
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.55);
+  color: #fff;
+
+  font-size: 20px;
+  font-weight: 900;
+
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+
+  display: grid;
+  place-items: center;
+
+  transition: 0.2s ease;
+}
+
+.navBtn:hover{
+  background: rgba(0,0,0,.75);
+  transform: translateY(-50%) scale(1.05);
+  border-color: rgba(102,192,244,.55);
+  color: var(--accent2);
+}
+
+.navBtn:active{
+  transform: translateY(-50%) scale(0.96);
+}
+
+.navBtn.left{ right: 14px; }
+.navBtn.right{ left: 14px; }
+
 
 .dots{
   position:absolute;
@@ -361,9 +413,15 @@ button:disabled {
 
 <body>
 <div class="container">
-  <h1>🎮 Steam Game Finder</h1>
-  <div class="subtitle">Semantic search for Steam games (FastAPI + HF Space)</div>
-
+  <div>
+    <center>
+      <h1>🎮 SteamSAGE</h1>
+      <h3>Search Games in your style...</h3>
+    </center>
+    
+  </div>
+  
+  
   <div class="search">
     <input id="query" placeholder="e.g. open world survival crafting game">
 
@@ -384,15 +442,17 @@ button:disabled {
 <div class="modalOverlay" id="modalOverlay">
   <div class="modal">
     <div class="modalHeader">
+      
       <div class="modalTitle" id="modalTitle">Game</div>
       <button class="closeBtn" id="closeModal">Close ✕</button>
     </div>
 
     <div class="modalBody">
       <div class="gallery" id="gallery">
-        <button class="navBtn left" id="prevBtn">⟵</button>
+        <button class="navBtn left" id="nextBtn">⟶</button>
         <img id="galleryImg" src="" alt="Screenshot">
-        <button class="navBtn right" id="nextBtn">⟶</button>
+        <button class="navBtn right" id="prevBtn">⟵</button>
+
         <div class="dots" id="dots"></div>
       </div>
 
