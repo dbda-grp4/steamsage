@@ -1,6 +1,6 @@
-# -----------------------------
+
 # Global
-# -----------------------------
+
 variable "aws_region" {
   description = "AWS region to deploy resources"
   type        = string
@@ -19,17 +19,17 @@ variable "environment" {
   default     = "dev"
 }
 
-# -----------------------------
+
 # S3
-# -----------------------------
+
 variable "data_bucket_name" {
   description = "S3 bucket for raw, silver data and scripts"
   type        = string
 }
 
-# -----------------------------
+
 # Glue
-# -----------------------------
+
 variable "glue_version" {
   description = "Glue version"
   type        = string
@@ -54,9 +54,9 @@ variable "glue_timeout" {
   default     = 60
 }
 
-# -----------------------------
+
 # Athena
-# -----------------------------
+
 variable "athena_database_name" {
   description = "Athena database name"
   type        = string
@@ -67,4 +67,5 @@ variable "github_repo" {
   description = "The GitHub repository (Org/Name) to trust. passed automatically by GitHub Actions."
   type        = string
 }
+
 
