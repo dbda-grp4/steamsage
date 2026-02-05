@@ -1,14 +1,12 @@
-# -----------------------------
+
 # Glue Jobs
-# -----------------------------
 
 locals {
   glue_scripts_path = "s3://${aws_s3_bucket.data_lake.bucket}/glue-scripts"
 }
 
-# -----------------------------
 # Applications Job
-# -----------------------------
+
 resource "aws_glue_job" "applications_job" {
   name     = "${var.project_name}-applications-job-${var.environment}"
   role_arn = aws_iam_role.glue_role.arn
@@ -25,10 +23,10 @@ resource "aws_glue_job" "applications_job" {
   }
 
   default_arguments = {
-    # 🔴 INPUT: Read from your PERMANENT existing bucket (Fixed Name)
+    # INPUT: Reading from permanent existing bucket (Fixed Name)
     "--RAW_BASE"    = "s3://steam-analytics-steam-analytics-aman-2026/raw"
 
-    # 🟢 OUTPUT: Write to the NEW dynamic bucket
+    # OUTPUT: Writing to the new dynamic bucket
     "--SILVER_BASE" = "s3://${aws_s3_bucket.data_lake.bucket}/silver"
     "--job-language" = "python"
   }
@@ -58,13 +56,13 @@ resource "aws_glue_job" "reviews_job" {
   }
 
   default_arguments = {
-    # 🔴 INPUT 1: Raw Data (Old Bucket)
+    # INPUT 1: Raw Data (Old Bucket)
     "--RAW_BASE"    = "s3://steam-analytics-steam-analytics-aman-2026/raw"
 
-    # 🔴 INPUT 2: Scores Data (Old Bucket - Silver Folder) -> ADDED THIS
+    # INPUT 2: Scores Data (Old Bucket - Silver Folder)
     "--SCORES_BASE" = "s3://steam-analytics-steam-analytics-aman-2026/silver"
 
-    # 🟢 OUTPUT: New Dynamic Bucket
+    # OUTPUT: New Dynamic Bucket
     "--SILVER_BASE" = "s3://${aws_s3_bucket.data_lake.bucket}/silver"
     "--job-language" = "python"
   }
@@ -75,9 +73,8 @@ resource "aws_glue_job" "reviews_job" {
   }
 }
 
-# -----------------------------
 # Dimensions Job
-# -----------------------------
+
 resource "aws_glue_job" "dimensions_job" {
   name     = "${var.project_name}-dimensions-job-${var.environment}"
   role_arn = aws_iam_role.glue_role.arn
@@ -94,10 +91,10 @@ resource "aws_glue_job" "dimensions_job" {
   }
 
   default_arguments = {
-    # 🔴 INPUT: Read from your PERMANENT existing bucket
+    # INPUT: Reading from permanent existing bucket
     "--RAW_BASE"    = "s3://steam-analytics-steam-analytics-aman-2026/raw"
 
-    # 🟢 OUTPUT: Write to the NEW dynamic bucket
+    # OUTPUT: Writing to the new dynamic bucket
     "--SILVER_BASE" = "s3://${aws_s3_bucket.data_lake.bucket}/silver"
     "--job-language" = "python"
   }
@@ -141,6 +138,7 @@ resource "aws_glue_crawler" "silver_crawler" {
     Environment = var.environment
   }
 }
+
 
 
 
