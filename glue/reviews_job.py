@@ -175,8 +175,7 @@ review_fact_df = review_fact_df.select(
 # --------------------------------------------------
 # Write SILVER output (Parquet)
 # --------------------------------------------------
-print(f"Writing output to: {review_out_parquet}")
 review_fact_df.write.mode("overwrite").parquet(review_out_parquet)
 
-print("Reviews job completed successfully.")
+
 
