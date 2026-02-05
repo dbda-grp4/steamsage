@@ -21,7 +21,6 @@ jobs:
       run:
         working-directory: ./infra
     
-    # Expose outputs to other jobs
     outputs:
       bucket_name: ${{ steps.tf_out.outputs.bucket_name }}
       role_arn:    ${{ steps.tf_out.outputs.role_arn }}
@@ -35,9 +34,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      # ---------------------------------------------------------
-      # 🛠️ THIS IS THE MISSING STEP!
-      # ---------------------------------------------------------
       - name: Create State Bucket if Missing
         id: create-state
         run: |
@@ -54,9 +50,6 @@ jobs:
 
       - uses: hashicorp/setup-terraform@v3
 
-      # ---------------------------------------------------------
-      # 🔌 THIS IS THE UPDATED INIT COMMAND
-      # ---------------------------------------------------------
       - name: Terraform Init
         env:
           STATE_BUCKET: ${{ env.BUCKET_NAME }}
@@ -80,137 +73,127 @@ jobs:
           echo "role_arn=$(terraform output -raw DEPLOY_ROLE_ARN)" >> $GITHUB_OUTPUT
 
   # --------------------------------------------------
-  # PHASE 2: Deploy Scripts
+  # PHASE 2: Upload Scripts (Prerequisite)
   # --------------------------------------------------
-  deploy:
-    name: Run Glue Jobs
+  upload-scripts:
+    name: Upload Glue Scripts
     runs-on: ubuntu-latest
     needs: terraform
-    
     env:
-      AWS_REGION: us-east-1
       BUCKET_NAME: ${{ needs.terraform.outputs.bucket_name }}
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ needs.terraform.outputs.role_arn }}
-          aws-region: ${{ env.AWS_REGION }}
-
+          aws-region: us-east-1
+      
       - name: Upload Glue scripts
         run: aws s3 sync glue/ s3://${BUCKET_NAME}/glue-scripts/ --delete
-        
-      # ---------------- APPLICATIONS JOB ----------------
-      - name: Run applications job
-        id: applications
-        run: |
-          RUN_ID=$(aws glue start-job-run \
-            --job-name steam-analytics-applications-job-dev \
-            --query JobRunId --output text)
 
-          echo "APPLICATIONS_RUN_ID=$RUN_ID" >> $GITHUB_ENV
+  # --------------------------------------------------
+  # PHASE 3: Run Glue Jobs (PARALLEL EXECUTION)
+  # --------------------------------------------------
+  
+  run-applications:
+    name: Run Applications Job
+    runs-on: ubuntu-latest
+    needs: [terraform, upload-scripts] # Starts after scripts are uploaded
+    env:
+      BUCKET_NAME: ${{ needs.terraform.outputs.bucket_name }}
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ needs.terraform.outputs.role_arn }}
+          aws-region: us-east-1
 
-      - name: Wait for applications job
+      - name: Trigger & Wait
         run: |
+          RUN_ID=$(aws glue start-job-run --job-name steam-analytics-applications-job-dev --query JobRunId --output text)
+          echo "Started Applications Job: $RUN_ID"
+          
           while true; do
-            STATUS=$(aws glue get-job-run \
-              --job-name steam-analytics-applications-job-dev \
-              --run-id $APPLICATIONS_RUN_ID \
-              --query JobRun.JobRunState --output text)
-
-            echo "Applications status: $STATUS"
-
-            if [ "$STATUS" = "SUCCEEDED" ]; then
-              break
-            elif [ "$STATUS" = "FAILED" ] || [ "$STATUS" = "STOPPED" ]; then
-              exit 1
-            fi
-
+            STATUS=$(aws glue get-job-run --job-name steam-analytics-applications-job-dev --run-id $RUN_ID --query JobRun.JobRunState --output text)
+            echo "Status: $STATUS"
+            if [ "$STATUS" = "SUCCEEDED" ]; then break; fi
+            if [ "$STATUS" = "FAILED" ] || [ "$STATUS" = "STOPPED" ]; then exit 1; fi
             sleep 30
           done
 
-      # ---------------- REVIEWS JOB ----------------
-      - name: Run reviews job
-        id: reviews
-        run: |
-          RUN_ID=$(aws glue start-job-run \
-            --job-name steam-analytics-reviews-job-dev \
-            --query JobRunId --output text)
+  run-reviews:
+    name: Run Reviews Job
+    runs-on: ubuntu-latest
+    needs: [terraform, upload-scripts] # Starts parallel to 'run-applications'
+    env:
+      BUCKET_NAME: ${{ needs.terraform.outputs.bucket_name }}
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ needs.terraform.outputs.role_arn }}
+          aws-region: us-east-1
 
-          echo "REVIEWS_RUN_ID=$RUN_ID" >> $GITHUB_ENV
-
-      - name: Wait for reviews job
+      - name: Trigger & Wait
         run: |
+          RUN_ID=$(aws glue start-job-run --job-name steam-analytics-reviews-job-dev --query JobRunId --output text)
+          echo "Started Reviews Job: $RUN_ID"
+          
           while true; do
-            STATUS=$(aws glue get-job-run \
-              --job-name steam-analytics-reviews-job-dev \
-              --run-id $REVIEWS_RUN_ID \
-              --query JobRun.JobRunState --output text)
-
-            echo "Reviews status: $STATUS"
-
-            if [ "$STATUS" = "SUCCEEDED" ]; then
-              break
-            elif [ "$STATUS" = "FAILED" ] || [ "$STATUS" = "STOPPED" ]; then
-              exit 1
-            fi
-
+            STATUS=$(aws glue get-job-run --job-name steam-analytics-reviews-job-dev --run-id $RUN_ID --query JobRun.JobRunState --output text)
+            echo "Status: $STATUS"
+            if [ "$STATUS" = "SUCCEEDED" ]; then break; fi
+            if [ "$STATUS" = "FAILED" ] || [ "$STATUS" = "STOPPED" ]; then exit 1; fi
             sleep 30
           done
 
-      # ---------------- DIMENSIONS JOB ----------------
-      - name: Run dimensions job
-        id: dimensions
-        run: |
-          RUN_ID=$(aws glue start-job-run \
-            --job-name steam-analytics-dimensions-job-dev \
-            --query JobRunId --output text)
+  run-dimensions:
+    name: Run Dimensions Job
+    runs-on: ubuntu-latest
+    needs: [terraform, upload-scripts] # Starts parallel to others
+    env:
+      BUCKET_NAME: ${{ needs.terraform.outputs.bucket_name }}
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ needs.terraform.outputs.role_arn }}
+          aws-region: us-east-1
 
-          echo "DIMENSIONS_RUN_ID=$RUN_ID" >> $GITHUB_ENV
-
-      - name: Wait for dimensions job
+      - name: Trigger & Wait
         run: |
+          RUN_ID=$(aws glue start-job-run --job-name steam-analytics-dimensions-job-dev --query JobRunId --output text)
+          echo "Started Dimensions Job: $RUN_ID"
+          
           while true; do
-            STATUS=$(aws glue get-job-run \
-              --job-name steam-analytics-dimensions-job-dev \
-              --run-id $DIMENSIONS_RUN_ID \
-              --query JobRun.JobRunState --output text)
-
-            echo "Dimensions status: $STATUS"
-
-            if [ "$STATUS" = "SUCCEEDED" ]; then
-              break
-            elif [ "$STATUS" = "FAILED" ] || [ "$STATUS" = "STOPPED" ]; then
-              exit 1
-            fi
-
+            STATUS=$(aws glue get-job-run --job-name steam-analytics-dimensions-job-dev --run-id $RUN_ID --query JobRun.JobRunState --output text)
+            echo "Status: $STATUS"
+            if [ "$STATUS" = "SUCCEEDED" ]; then break; fi
+            if [ "$STATUS" = "FAILED" ] || [ "$STATUS" = "STOPPED" ]; then exit 1; fi
             sleep 30
           done
 
-# ---------------- SILVER CRAWLER (ADDED) ----------------
-      - name: Run Silver Crawler
+  # --------------------------------------------------
+  # PHASE 4: Run Crawler (SEQUENTIAL - THE FINAL STEP)
+  # --------------------------------------------------
+  run-crawler:
+    name: Run Silver Crawler
+    runs-on: ubuntu-latest
+    # ⚠️ THIS IS THE KEY: Wait for ALL 3 jobs to finish
+    needs: [terraform, run-applications, run-reviews, run-dimensions]
+    env:
+      BUCKET_NAME: ${{ needs.terraform.outputs.bucket_name }}
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ needs.terraform.outputs.role_arn }}
+          aws-region: us-east-1
+
+      - name: Run Crawler
         run: |
           echo "Starting Silver Crawler..."
           aws glue start-crawler --name steam-analytics-silver-crawler-dev
-
-          # Give it a moment to shift to RUNNING state
           sleep 10
-
           while true; do
-            STATUS=$(aws glue get-crawler \
-              --name steam-analytics-silver-crawler-dev \
-              --query Crawler.State --output text)
-
+            STATUS=$(aws glue get-crawler --name steam-analytics-silver-crawler-dev --query Crawler.State --output text)
             echo "Crawler status: $STATUS"
-
-            # Crawlers go from READY -> RUNNING -> STOPPING -> READY
-            # We wait until it returns to READY
-            if [ "$STATUS" = "READY" ]; then
-              echo "Crawler finished successfully!"
-              break
-            fi
-
+            if [ "$STATUS" = "READY" ]; then echo "Finished!"; break; fi
             sleep 30
           done
